@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Final Smash Quest: Virtues vs Sins | RPG Game</title>
+    <style>
+        body { margin: 0; padding: 0; background: #000; font-family: 'Courier New', monospace; color: #fff; }
+        #game-container { width: 800px; height: 600px; margin: 20px auto; border: 2px solid #0056a0; position: relative; }
+        canvas { display: block; image-rendering: pixelated; }
+        #hud { position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); padding: 10px; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div id="hud">
+            Final Smash Quest: Virtues vs Sins<br>
+            Arrows: Move | Enter/Space: Action | M: Menu | C: Jesus Summon (Post-Game)<br>
+            Gold: <span id="gold">100</span> | Virtues: <span id="virtues">0/7</span>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+        ctx.imageSmoothingEnabled = false;
+
+        const TILE_SIZE = 32;
+        const WORLD_WIDTH = 60, WORLD_HEIGHT = 60;
+
+        // Intro Pages (Catechism, Genesis, Revelation)
+        const introPages = [
+            `Catechism of the Catholic Church (CCC 1849-1855):\nSin is an offense against reason, truth, and right conscience;\nit is failure in genuine love for God and neighbor.\nMortal sin destroys charity in the heart; venial sin weakens it.\nSin wounds human nature and injures human solidarity.`,
+            `Genesis 3 (RSVCE / Ignatius Study Bible):\nThe serpent deceived Eve: "You will not die... your eyes will be opened."\nShe ate and gave to Adam, who ate. Their eyes were opened;\nthey knew they were naked. God cursed the ground,\nintroduced pain, toil, and death. Protoevangelium (3:15):\nThe seed of the woman shall crush the serpent's head.`,
+            `Confraternity / Great Adventure Bible Notes:\nOriginal Sin entered through Adam and Eve's disobedience.\nDeath and suffering came through the devil's envy.\nThe Fall affects all humanity until redemption in Christ.`,
+            `Revelation 21:1-4:\n"I saw a new heaven and a new earth...\nHe will wipe away every tear... no more death,\nmourning, crying or pain, for the old order has passed away."\nSin cursed the world; Christ restores it through His victory.`,
+            `This Game: Seven towns are plagued by the Seven Capital Sins.\nDefeat each boss to gain the opposing Virtue.\nConfess in church for forgiveness and strength.\nFinal boss: Sephiroth (Pride). After victory, meet Christ.\nPress Enter to begin your quest of redemption!`
+        ];
+        let introPage = 0;
+
+        // Map Generation
+        let overworldMap = Array.from({length: WORLD_HEIGHT}, () => Array(WORLD_WIDTH).fill(0));
+        const townPos = [[10,5],[20,15],[30,25],[40,35],[50,45],[15,40],[45,10]];
+        function generateMap() {
+            for (let y = 0; y < WORLD_HEIGHT; y++) {
+                for (let x = 0; x < WORLD_WIDTH; x++) {
+                    let base = y < 15 ? 3 : y < 30 ? 4 : 0;
+                    overworldMap[y][x] = base;
+                    if (Math.random() < 0.08) overworldMap[y][x] = 1;
+                    if (Math.random() < 0.04 + y/WORLD_HEIGHT*0.06) overworldMap[y][x] = 2;
+                }
+            }
+            townPos.forEach((p,i) => overworldMap[p[1]][p[0]] = 6);
+        }
+        generateMap();
+
+        const towns = [
+            {name:'Envyville',sin:'Envy',virtue:'Kindness',saint:'St. Martin de Porres',boss:{name:'Legion',hp:250,mhp:250,atk:22,def:12,spd:12}},
+            {name:'Greedtown',sin:'Greed',virtue:'Charity',saint:'St. Francis of Assisi',boss:{name:'Spoil',hp:300,mhp:300,atk:25,def:15,spd:13}},
+            {name:'Decepticon City',sin:'Greed',virtue:'Diligence',saint:'St. Joseph',boss:{name:'Decepticon',hp:350,mhp:350,atk:28,def:18,spd:14}},
+            {name:'Gluttonburg',sin:'Gluttony',virtue:'Temperance',saint:'St. Benedict',boss:{name:'Veterinarian',hp:400,mhp:400,atk:30,def:20,spd:11}},
+            {name:'Lusthaven',sin:'Lust',virtue:'Chastity',saint:'St. Augustine',boss:{name:'Cravings',hp:450,mhp:450,atk:32,def:22,spd:16}},
+            {name:'Wrath',sin:'Wrath',virtue:'Patience',saint:'St. Francis de Sales',boss:{name:'Wrath',hp:500,mhp:500,atk:35,def:25,spd:18}},
+            {name:'PrideTown',sin:'Pride',virtue:'Humility',saint:'St. Thomas Aquinas',boss:{name:'Sephiroth',hp:600,mhp:600,atk:40,def:30,spd:20,quote:'I will cleanse this imperfect world!'}}
+        ];
+
+        let player = {x:30,y:30,px:30*TILE_SIZE,py:30*TILE_SIZE,moving:false};
+
+        const STATES = {INTRO:1,OVERWORLD:2,TOWN:3,CHURCH:4,CONFESSION:5,BATTLE:6,MENU:7,DIALOG:8,POSTGAME:9};
+        let state = STATES.INTRO;
+        let curTown = 0;
+        let confessionStep = 0;
+        let churchOption = 0;
+
+        // Party (10 chars)
+        const partyBase = [
+            {name:'Cloud',hp:120,mhp:120,mp:50,mmp:50,atk:25,def:15,spd:10,lvl:1,xp:0,nextXp:100,weapList:['Excalibur','Mjolnir','Ultima Weapon']},
+            {name:'Sora',hp:100,mhp:100,mp:70,mmp:70,atk:20,def:12,spd:14,lvl:1,xp:0,nextXp:100,weapList:['Kingdom Key','Oathkeeper','Ultima Keyblade']},
+            {name:'Terra',hp:90,mhp:90,mp:80,mmp:80,atk:18,def:18,spd:12,lvl:1,xp:0,nextXp:100,weapList:['Earthshaker','Ends of Earth']},
+            {name:'Vivi',hp:80,mhp:80,mp:100,mmp:100,atk:15,def:10,spd:8,lvl:1,xp:0,nextXp:100,weapList:['Oak Staff','Mace of Zeus']},
+            {name:'Tidus',hp:110,mhp:110,mp:60,mmp:60,atk:22,def:14,spd:16,lvl:1,xp:0,nextXp:100,weapList:['Brotherhood','Caladbolg']},
+            {name:'Yuna',hp:85,mhp:85,mp:90,mmp:90,atk:16,def:16,spd:10,lvl:1,xp:0,nextXp:100,weapList:['Nirvana']},
+            {name:'Dr. Strange',hp:95,mhp:95,mp:120,mmp:120,atk:24,def:16,spd:15,lvl:1,xp:0,nextXp:100,weapList:['Eye of Agamotto']},
+            {name:'Fei',hp:130,mhp:130,mp:40,mmp:40,atk:28,def:14,spd:12,lvl:1,xp:0,nextXp:100,weapList:['Deathblow']},
+            {name:'Bart',hp:105,mhp:105,mp:55,mmp:55,atk:26,def:13,spd:13,lvl:1,xp:0,nextXp:100,weapList:['Ancient Whip']},
+            {name:'Wakka',hp:115,mhp:115,mp:40,mmp:40,atk:27,def:13,spd:13,lvl:1,xp:0,nextXp:100,weapList:['World Champion','Pestilence','Fireworks']}
+        ];
+        let party = JSON.parse(JSON.stringify(partyBase));
+        let activeParty = [0,1,2];
+        let unlocked = [1,1,1,1,1,1,0,1,1,0]; // Strange after 2, Wakka after 4
+
+        let virtuesGained = 0;
+        let gold = 100;
+
+        let inventory = {items:{potion:5,prayer:1,confession:0},equipped:Array(10).fill(0)};
+
+        const enemyTypes = [{name:'Soldier',hp:60,atk:15,def:8,spd:9,xp:30,gold:15},{name:'Slime',hp:40,atk:10,def:4,spd:6,xp:20,gold:10},{name:'Shadow',hp:50,atk:14,def:6,spd:11,xp:25,gold:12}];
+
+        let enemies = [];
+        let battlePartyAtb = [0,0,0];
+        let enemyAtb = [];
+        let curActor = -1;
+        let battleMenu = 0;
+        let jesusSummoned = false;
+
+        const keys = {};
+        document.addEventListener('keydown', e => keys[e.key.toLowerCase()] = true);
+        document.addEventListener('keyup', e => keys[e.key.toLowerCase()] = false);
+
+        function updateHud() {
+            document.getElementById('gold').textContent = gold;
+            document.getElementById('virtues').textContent = `${virtuesGained}/7`;
+        }
+
+        function gameLoop() {
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+
+        function update() {
+            updateHud();
+            if (state === STATES.INTRO && (keys['enter'] || keys[' '])) {
+                introPage++;
+                if (introPage >= introPages.length) state = STATES.OVERWORLD;
+            }
+            if (state === STATES.OVERWORLD) updateOverworld();
+            if (state === STATES.TOWN) updateTown();
+            if (state === STATES.CHURCH) updateChurch();
+            if (state === STATES.CONFESSION) updateConfession();
+            if (state === STATES.BATTLE) updateBattle();
+
+            if (virtuesGained >= 2) unlocked[6] = 1;
+            if (virtuesGained >= 4) unlocked[9] = 1;
+        }
+
+        function updateOverworld() {
+            if (player.moving) return;
+            let dx=0, dy=0;
+            if (keys['arrowleft']) dx=-1;
+            if (keys['arrowright']) dx=1;
+            if (keys['arrowup']) dy=-1;
+            if (keys['arrowdown']) dy=1;
+            if (dx || dy) {
+                let nx = player.x + dx, ny = player.y + dy;
+                if (nx>=0 && nx<WORLD_WIDTH && ny>=0 && ny<WORLD_HEIGHT && overworldMap[ny][nx] !==1) {
+                    player.moving = true;
+                    let tx = nx*TILE_SIZE, ty = ny*TILE_SIZE;
+                    let step = 4;
+                    let mv = setInterval(() => {
+                        player.px += dx*step;
+                        player.py += dy*step;
+                        if (Math.abs(tx-player.px)<step && Math.abs(ty-player.py)<step) {
+                            player.x = nx; player.y = ny; player.px = tx; player.py = ty;
+                            player.moving = false;
+                            clearInterval(mv);
+                            let level = Math.floor(ny/10) + virtuesGained;
+                            if (overworldMap[ny][nx] === 2 && Math.random()<0.5) initRandomBattle(level);
+                            let tid = townPos.findIndex(p=>p[0]===nx && p[1]===ny);
+                            if (tid !== -1) { curTown = tid; state = STATES.TOWN; }
+                        }
+                    },16);
+                }
+            }
+            if (keys['m']) state = STATES.MENU;
+        }
+
+        function updateTown() {
+            if (keys['enter'] || keys[' ']) {
+                let r = Math.random();
+                if (r < 0.5) state = STATES.CHURCH;
+                else initBossBattle(curTown);
+            }
+            if (keys['escape']) state = STATES.OVERWORLD;
+        }
+
+        function updateChurch() {
+            if (keys['arrowup'] || keys['arrowdown']) churchOption = 1 - churchOption;
+            if (keys['enter'] || keys[' ']) {
+                if (churchOption === 0) showDialog(`Vice: ${towns[curTown].sin}\nVirtue: ${towns[curTown].virtue}\n-${towns[curTown].saint}`);
+                else state = STATES.CONFESSION;
+            }
+            if (keys['escape']) state = STATES.TOWN;
+        }
+
+        const confessionSteps = [
+            "In the name of the Father, and of the Son, and of the Holy Spirit. Amen.\nBless me, Father, for I have sinned.",
+            `My last confession was approximately one month ago.\nI have committed venial and mortal sins.`,
+            "This is all I can remember. I am sorry for these and all my sins.",
+            "Priest: Your penance is to vanquish the sin plaguing this town.\nSay your Act of Contrition.",
+            "My God, I am sorry for my sins with all my heart...\n[Full Act of Contrition]\nOur Savior Jesus Christ suffered and died for us.\nIn His name, my God, have mercy.",
+            "Priest: God, the Father of mercies... I absolve you from your sins\nin the name of the Father, and of the Son, and of the Holy Spirit. Amen.\n(Receive Confession: +50 MP)"
+        ];
+
+        function updateConfession() {
+            if (keys['enter'] || keys[' ']) {
+                confessionStep++;
+                if (confessionStep >= confessionSteps.length) {
+                    inventory.items.confession++;
+                    showDialog("Confession complete. MP restored.");
+                    state = STATES.TOWN;
+                    confessionStep = 0;
+                }
+            }
+            if (keys['escape']) state = STATES.CHURCH;
+        }
+
+        function initRandomBattle(level=0) {
+            state = STATES.BATTLE;
+            enemies = [scaledEnemy(level), scaledEnemy(level)];
+            battlePartyAtb = [0,0,0]; enemyAtb = [0,0];
+        }
+
+        function scaledEnemy(level) {
+            let e = JSON.parse(JSON.stringify(enemyTypes[Math.floor(Math.random()*3)]));
+            e.hp *= (1 + level*0.2); e.mhp = e.hp;
+            e.atk *= (1 + level*0.15);
+            return e;
+        }
+
+        function initBossBattle(tid) {
+            state = STATES.BATTLE;
+            let b = towns[tid].boss;
+            enemies = [{...b}];
+            battlePartyAtb = [0,0,0]; enemyAtb = [0];
+        }
+
+        function updateBattle() {
+            // ATB
+            for (let i=0;i<3;i++) {
+                let p = party[activeParty[i]];
+                if (p.hp>0) battlePartyAtb[i] = Math.min(100, battlePartyAtb[i] + p.spd/8);
+            }
+            enemies.forEach((e,i) => { if (e.hp>0) enemyAtb[i] = Math.min(100, enemyAtb[i] + e.spd/8); });
+
+            // Enemy turn
+            enemies.forEach((e,i) => {
+                if (enemyAtb[i]>=100 && e.hp>0) {
+                    let tgt = activeParty.findIndex(idx => party[idx].hp>0);
+                    let dmg = Math.max(1, e.atk - party[tgt].def/2);
+                    party[tgt].hp -= dmg;
+                    enemyAtb[i]=0;
+                }
+            });
+
+            // Player turn
+            if (curActor === -1) {
+                for (let i=0;i<3;i++) if (battlePartyAtb[i]>=100) { curActor = i; battleMenu=0; break; }
+            }
+
+            if (curActor >=0 && (keys['enter'] || keys[' '])) {
+                let p = party[activeParty[curActor]];
+                let tgt = enemies.findIndex(e=>e.hp>0);
+                let dmg = Math.max(1, p.atk * (battleMenu===4?2.5:1.5) - enemies[tgt].def/2);
+                enemies[tgt].hp -= dmg;
+                battlePartyAtb[curActor]=0;
+                curActor=-1;
+            }
+
+            if (keys['arrowup']) battleMenu = Math.max(0,battleMenu-1);
+            if (keys['arrowdown']) battleMenu = Math.min(4,battleMenu+1);
+
+            if (state===STATES.POSTGAME && keys['c']) {
+                enemies.forEach(e=>e.hp=0);
+            }
+
+            // Victory
+            if (enemies.every(e=>e.hp<=0)) {
+                let xp = enemies.reduce((a,e)=>a+(e.xp||50),0);
+                let g = enemies.reduce((a,e)=>a+(e.gold||20),0);
+                activeParty.forEach(i => {
+                    party[i].xp += xp/3;
+                    if (party[i].xp >= party[i].nextXp) { party[i].lvl++; party[i].mhp+=10; party[i].hp=party[i].mhp; party[i].atk+=3; party[i].nextXp+=50; }
+                });
+                gold += g;
+                if (enemies[0].name === towns[curTown]?.boss?.name) {
+                    virtuesGained++;
+                    if (virtuesGained===7) state=STATES.POSTGAME;
+                }
+                state = virtuesGained<7 ? STATES.TOWN : STATES.OVERWORLD;
+            }
+            if (activeParty.every(i=>party[i].hp<=0)) state = STATES.DIALOG; // Game Over simplified
+        }
+
+        function showDialog(text) {
+            state = STATES.DIALOG;
+            currentDialog = text;
+        }
+
+        let currentDialog = "";
+
+        function draw() {
+            ctx.fillStyle = '#000'; ctx.fillRect(0,0,800,600);
+
+            if (state === STATES.INTRO) {
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Courier New';
+                let lines = introPages[introPage].split('\n');
+                lines.forEach((l,i)=>ctx.fillText(l,40,100+i*30));
+                ctx.fillText(`Page ${introPage+1}/${introPages.length} - Press Enter`,40,550);
+            }
+            else if (state === STATES.OVERWORLD || state === STATES.TOWN) {
+                let offx = Math.floor(player.px/TILE_SIZE)-12, offy = Math.floor(player.py/TILE_SIZE)-9;
+                for (let y=0;y<19;y++) for (let x=0;x<25;x++) {
+                    let tx=offx+x, ty=offy+y;
+                    if (tx<0||tx>=WORLD_WIDTH||ty<0||ty>=WORLD_HEIGHT) continue;
+                    let t=overworldMap[ty][tx];
+                    if (t===0) ctx.fillStyle='#228B22';
+                    else if (t===1) ctx.fillStyle='#006400';
+                    else if (t===2) ctx.fillStyle='#8B4513';
+                    else if (t===3) ctx.fillStyle='#F0F8FF';
+                    else if (t===4) ctx.fillStyle='#808080';
+                    else if (t===6) ctx.fillStyle='#FFD700';
+                    ctx.fillRect(x*TILE_SIZE,y*TILE_SIZE,TILE_SIZE,TILE_SIZE);
+                }
+                // Player
+                ctx.fillStyle = '#00BFFF';
+                ctx.fillRect(player.px+8,player.py+4,16,24);
+                ctx.fillStyle = '#FFD700';
+                ctx.fillRect(player.px+6,player.py,20,12);
+
+                if (state === STATES.TOWN) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.7)';
+                    ctx.fillRect(200,200,400,200);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = '20px Courier New';
+                    ctx.fillText(towns[curTown].name,250,250);
+                    ctx.fillText('Enter: Church / Boss',250,300);
+                }
+            }
+            else if (state === STATES.CHURCH) {
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fillRect(150,150,500,300);
+                ctx.fillStyle = churchOption===0 ? '#ff0' : '#fff';
+                ctx.fillText('> Speak to Priest',200,250);
+                ctx.fillStyle = churchOption===1 ? '#ff0' : '#fff';
+                ctx.fillText('> Make Confession',200,300);
+            }
+            else if (state === STATES.CONFESSION) {
+                ctx.fillStyle = 'rgba(0,0,0,0.9)';
+                ctx.fillRect(100,100,600,400);
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Courier New';
+                let lines = confessionSteps[confessionStep].split('\n');
+                lines.forEach((l,i)=>ctx.fillText(l,120,150+i*40));
+                ctx.fillText('Press Enter to continue',120,450);
+            }
+            else if (state === STATES.BATTLE) {
+                ctx.fillStyle = '#333'; ctx.fillRect(0,0,800,600);
+                // Party
+                activeParty.forEach((i,j) => {
+                    let p = party[i];
+                    ctx.fillStyle = p.hp>0 ? '#0ff' : '#555';
+                    ctx.fillRect(60+j*200,400,80,80);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(p.name,70+j*200,430);
+                    ctx.fillText(`HP:${p.hp}/${p.mhp}`,70+j*200,450);
+                });
+                // Enemies
+                enemies.forEach((e,i) => {
+                    ctx.fillStyle = e.hp>0 ? '#f00' : '#555';
+                    ctx.fillRect(500+i*100,150,90,90);
+                    ctx.fillStyle = '#fff';
+                    ctx.fillText(e.name,510+i*100,190);
+                    ctx.fillText(`${e.hp}/${e.mhp}`,510+i*100,220);
+                });
+                if (curActor >=0) {
+                    ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                    ctx.fillRect(200,450,400,100);
+                    const opts = ['Attack','Special','Item','Magic','Combo'];
+                    opts.forEach((o,j)=> {
+                        ctx.fillStyle = j===battleMenu ? '#ff0' : '#fff';
+                        ctx.fillText(o,250+j*70,490);
+                    });
+                }
+            }
+            else if (state === STATES.DIALOG) {
+                ctx.fillStyle = 'rgba(0,0,0,0.8)';
+                ctx.fillRect(100,200,600,200);
+                ctx.fillStyle = '#fff';
+                ctx.font = '16px Courier New';
+                let lines = currentDialog.split('\n');
+                lines.forEach((l,i)=>ctx.fillText(l,120,240+i*30));
+            }
+            else if (state === STATES.POSTGAME) {
+                ctx.fillStyle = '#ffd700';
+                ctx.font = '32px Courier New';
+                ctx.textAlign = 'center';
+                ctx.fillText('Victory! Christ has conquered sin.',400,300);
+                ctx.fillText('Press C in battle to summon Jesus (instakill).',400,350);
+                ctx.textAlign = 'left';
+            }
+        }
+
+        gameLoop();
+    </script>
+</body>
+</html>
