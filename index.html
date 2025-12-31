@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Final Smash Quest: Virtues vs Sins - Touch Controller</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            touch-action: none;
+        }
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        #game-canvas {
+            width: 800px;
+            height: 600px;
+            image-rendering: pixelated;
+            border: 4px solid #0056a0;
+            box-shadow: 0 0 30px rgba(0,86,160,0.6);
+            background: #111;
+        }
+        #controller {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            right: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            pointer-events: none;
+        }
+        .dpad, .action-buttons {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            pointer-events: all;
+        }
+        .dpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            background: rgba(0,0,0,0.6);
+            padding: 15px;
+            border-radius: 20px;
+        }
+        .btn {
+            width: 70px;
+            height: 70px;
+            background: #0056a0;
+            color: white;
+            font-size: 24px;
+            border: none;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            user-select: none;
+            touch-action: manipulation;
+            transition: transform 0.1s, background 0.1s;
+        }
+        .btn:active {
+            background: #ff6600;
+            transform: scale(0.9);
+        }
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .action-buttons .row {
+            display: flex;
+            gap: 15px;
+        }
+        .start-select {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .start, .select {
+            width: 80px;
+            height: 40px;
+            background: #333;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+        .start:active { background: #00aa00; }
+        .select:active { background: #aa0000; }
+        #hud {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 12px;
+            border: 1px solid #0056a0;
+        }
+        @media (max-width: 768px) {
+            #game-canvas { width: 100%; height: auto; aspect-ratio: 4/3; }
+            .btn { width: 65px; height: 65px; font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas" width="800" height="600"></canvas>
+        <div id="hud">
+            Final Smash Quest: Virtues vs Sins<br>
+            Tap buttons below to move & act<br>
+            Gold: <span id="gold">200</span> | Virtues: <span id="virtues">0/7</span>
+        </div>
+
+        <!-- On-screen PS1-style controller -->
+        <div id="controller">
+            <!-- Left: D-Pad -->
+            <div class="dpad">
+                <div></div>
+                <button class="btn" id="up">↑</button>
+                <div></div>
+                <button class="btn" id="left">←</button>
+                <div></div>
+                <button class="btn" id="right">→</button>
+                <div></div>
+                <button class="btn" id="down">↓</button>
+                <div></div>
+            </div>
+
+            <!-- Right: Action buttons & Start/Select -->
+            <div class="action-buttons">
+                <div class="row">
+                    <button class="btn" id="triangle">△</button>
+                </div>
+                <div class="row">
+                    <button class="btn" id="square">□</button>
+                    <button class="btn" id="circle">○</button>
+                </div>
+                <div class="row">
+                    <button class="btn" id="cross">×</button>
+                </div>
+                <div class="start-select">
+                    <button class="select" id="select">SELECT</button>
+                    <button class="start" id="start">START</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('game-canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Simple state (for touch controller to control game)
+        let state = 'title'; // title, overworld, battle, etc.
+        let player = { x: 400, y: 300 };
+        let gold = 200;
+        let virtues = 0;
+
+        // Touch/click controls
+        const buttons = {
+            up: document.getElementById('up'),
+            down: document.getElementById('down'),
+            left: document.getElementById('left'),
+            right: document.getElementById('right'),
+            cross: document.getElementById('cross'),
+            circle: document.getElementById('circle'),
+            square: document.getElementById('square'),
+            triangle: document.getElementById('triangle'),
+            start: document.getElementById('start'),
+            select: document.getElementById('select')
+        };
+
+        // Map button presses to game actions
+        function handleButtonPress(button) {
+            if (state === 'title') {
+                if (button === 'cross') state = 'overworld';
+            } else if (state === 'overworld') {
+                if (button === 'up') player.y -= 10;
+                if (button === 'down') player.y += 10;
+                if (button === 'left') player.x -= 10;
+                if (button === 'right') player.x += 10;
+                if (button === 'cross') {
+                    // Interact / attack
+                    alert('Action!');
+                }
+                if (button === 'start') state = 'menu';
+            }
+            // Add battle logic if needed
+            updateHud();
+        }
+
+        // Add event listeners to all buttons
+        Object.keys(buttons).forEach(key => {
+            buttons[key].addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                handleButtonPress(key);
+            });
+            buttons[key].addEventListener('mousedown', (e) => {
+                e.preventDefault();
+                handleButtonPress(key);
+            });
+        });
+
+        // Update HUD
+        function updateHud() {
+            document.getElementById('gold').textContent = gold;
+            document.getElementById('virtues').textContent = `${virtues}/7`;
+        }
+
+        // Simple game loop
+        function gameLoop() {
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, 800, 600);
+
+            if (state === 'title') {
+                ctx.fillStyle = '#fff';
+                ctx.font = 'bold 40px Arial';
+                ctx.fillText('Final Smash Quest', 150, 200);
+                ctx.font = '24px Arial';
+                ctx.fillText('Tap ○ (Cross) to Start', 200, 300);
+            } else if (state === 'overworld') {
+                ctx.fillStyle = '#228B22';
+                ctx.fillRect(0, 0, 800, 600);
+                ctx.fillStyle = '#00BFFF';
+                ctx.fillRect(player.x - 20, player.y - 20, 40, 40);
+                ctx.fillStyle = '#fff';
+                ctx.font = '20px Arial';
+                ctx.fillText('Explore with D-Pad', 200, 100);
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        // Start game
+        updateHud();
+        gameLoop();
+    </script>
+</body>
+</html>
