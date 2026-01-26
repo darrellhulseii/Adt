@@ -57,27 +57,32 @@
         .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s; }
         .input-group input:focus, .input-group select:focus { outline: none; border-color: #0069d9; box-shadow: 0 0 0 3px rgba(0, 105, 217, 0.1); }
         
-        .equipment-section { background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0; }
-        .equipment-item { display: grid; grid-template-columns: 2fr 1fr 1fr 80px; gap: 15px; align-items: center; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e9ecef; }
-        .equipment-item input { padding: 10px; }
-        .equipment-item button { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .equipment-item button:hover { background: #c82333; }
+        .equipment-section { background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0; max-height: 600px; overflow-y: auto; }
+        .equipment-header { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 15px; padding: 12px; font-weight: 700; color: #003d82; border-bottom: 2px solid #dee2e6; margin-bottom: 15px; font-size: 0.9em; }
+        .equipment-item { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 15px; align-items: center; margin-bottom: 10px; padding: 12px; background: white; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.2s; }
+        .equipment-item:hover { border-color: #0069d9; box-shadow: 0 2px 8px rgba(0, 105, 217, 0.1); }
+        .equipment-item.has-qty { background: #e7f3ff; border-color: #0069d9; }
+        .equipment-item label { font-weight: 600; color: #333; font-size: 0.9em; }
+        .equipment-item .cost { color: #666; font-size: 0.85em; margin-top: 3px; }
+        .equipment-item input { padding: 8px; text-align: center; font-weight: 600; border: 2px solid #e0e0e0; border-radius: 6px; }
+        .equipment-item input:focus { outline: none; border-color: #0069d9; }
+        .equipment-item .subtotal { font-weight: 700; color: #0057b8; text-align: right; font-size: 0.95em; }
         
         .results-panel { background: linear-gradient(135deg, #003d82 0%, #0069d9 100%); color: white; padding: 30px; border-radius: 16px; position: sticky; top: 100px; }
         .result-item { margin: 15px 0; padding: 20px; background: rgba(255, 255, 255, 0.15); border-radius: 12px; }
         .result-item h3 { font-size: 0.95em; margin-bottom: 8px; font-weight: 600; opacity: 0.9; }
         .result-item .value { font-size: 2em; font-weight: 700; }
         .result-item.small .value { font-size: 1.5em; }
+        .result-item.package-detected { background: rgba(40, 167, 69, 0.3); border: 2px solid rgba(40, 167, 69, 0.6); }
         
         .deductions-breakdown { background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 12px; margin-top: 20px; }
-        .deduction-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-        .deduction-line:last-child { border-bottom: none; font-weight: 700; font-size: 1.1em; }
+        .deduction-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.95em; }
+        .deduction-line:last-child { border-bottom: none; font-weight: 700; font-size: 1.1em; margin-top: 10px; padding-top: 15px; border-top: 2px solid rgba(255, 255, 255, 0.3); }
+        .deduction-line.labor-detail { padding-left: 20px; font-size: 0.85em; opacity: 0.9; }
         
         .saved-orders { margin-top: 40px; background: #f8f9fa; padding: 40px; border-radius: 16px; border: 2px solid #e9ecef; }
         .order-item { background: white; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 61, 130, 0.06); border-left: 4px solid #0069d9; }
         
-        .btn-add { background: #28a745; margin-top: 10px; }
-        .btn-add:hover { background: #218838; }
         .logout-btn { background: #6c757d; padding: 10px 30px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: 600; }
         
         footer { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; text-align: center; padding: 60px 40px; }
@@ -85,7 +90,8 @@
         @media(max-width: 1024px) {
             .calc-grid { grid-template-columns: 1fr; }
             .results-panel { position: static; }
-            .equipment-item { grid-template-columns: 1fr; }
+            .equipment-item, .equipment-header { grid-template-columns: 2fr 70px 90px 70px; gap: 8px; font-size: 0.85em; }
+            .equipment-item label { font-size: 0.8em; }
         }
     </style>
 </head>
@@ -177,7 +183,7 @@
 
 <div id="dashboard">
     <div class="dashboard-header">
-        <div style="max-width:1600px; margin:0 auto; display:flex; justify-content:space-between; align-items:center">
+        <div style="max-width:1600px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap;">
             <div>
                 <h1>Dealer Dashboard</h1>
                 <p style="color:#666">Commission Calculator & Order Management</p>
@@ -241,21 +247,31 @@
                     </div>
                     
                     <div class="input-group">
-                        <label>Upsell Amount ($)</label>
+                        <label>Additional Upsell Amount ($)</label>
                         <input type="number" id="upsellAmount" value="0" step="10" min="0">
-                        <small style="color: #666; display: block; margin-top: 5px;">100% retained by contractor (max 50% markup on equipment)</small>
+                        <small style="color: #666; display: block; margin-top: 5px;">Any additional charges beyond equipment (100% retained)</small>
                     </div>
                     
                     <div class="equipment-section">
-                        <h3 style="margin-bottom: 20px; color: #003d82;">Equipment Customization</h3>
+                        <h3 style="margin-bottom: 20px; color: #003d82;">Equipment Selection</h3>
+                        <div class="equipment-header">
+                            <div>Equipment Item</div>
+                            <div style="text-align: center;">Qty</div>
+                            <div style="text-align: center;">Sell Price</div>
+                            <div style="text-align: right;">Cost</div>
+                        </div>
                         <div id="equipmentList"></div>
-                        <button class="btn btn-add" onclick="addEquipment()">+ Add Equipment</button>
                     </div>
                     
                     <button class="btn" onclick="calculate()" style="width:100%; margin-top:20px; font-size: 1.1em;">Calculate Commission</button>
                 </div>
                 
                 <div class="results-panel">
+                    <div class="result-item package-detected">
+                        <h3>Detected Package</h3>
+                        <div class="value" id="detectedPackage" style="font-size: 1.3em;">Basic</div>
+                    </div>
+                    
                     <div class="result-item">
                         <h3>Gross Commission</h3>
                         <div class="value" id="grossCommission">$0.00</div>
@@ -279,7 +295,27 @@
                             <span>Installation Labor:</span>
                             <span id="laborCost">-$0.00</span>
                         </div>
-                        <div class="deduction-line" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(255,255,255,0.3);">
+                        <div class="deduction-line labor-detail" id="laborBase" style="display:none;">
+                            <span>• Base Install (5pt):</span>
+                            <span>-$150.00</span>
+                        </div>
+                        <div class="deduction-line labor-detail" id="laborCameras" style="display:none;">
+                            <span id="laborCameraText">• Cameras:</span>
+                            <span id="laborCameraAmount">$0.00</span>
+                        </div>
+                        <div class="deduction-line labor-detail" id="laborLocks" style="display:none;">
+                            <span id="laborLockText">• Locks:</span>
+                            <span id="laborLockAmount">$0.00</span>
+                        </div>
+                        <div class="deduction-line labor-detail" id="laborDoorbells" style="display:none;">
+                            <span id="laborDoorbellText">• Doorbells:</span>
+                            <span id="laborDoorbellAmount">$0.00</span>
+                        </div>
+                        <div class="deduction-line labor-detail" id="laborThermostats" style="display:none;">
+                            <span id="laborThermostatText">• Thermostats:</span>
+                            <span id="laborThermostatAmount">$0.00</span>
+                        </div>
+                        <div class="deduction-line">
                             <span>Total Deductions:</span>
                             <span id="totalDeductions">-$200.00</span>
                         </div>
@@ -296,8 +332,8 @@
                     </div>
                     
                     <div class="result-item small">
-                        <h3>Upsell Profit (100%)</h3>
-                        <div class="value" id="upsellProfit">$0.00</div>
+                        <h3>Equipment Markup Profit</h3>
+                        <div class="value" id="equipmentProfit">$0.00</div>
                     </div>
                 </div>
             </div>
@@ -314,33 +350,52 @@
 <script>
 const DEALER_PASSWORD = "ADT2025";
 let orders = [];
-let equipmentCounter = 0;
 
 const equipmentPrices = {
-    'ADT 7" Command Panel': 173.25,
-    'ADT Hybrid Panel': 99.75,
-    'LTE Radio (Verizon)': 52.50,
-    'LTE Radio (AT&T)': 52.50,
-    'Door/Window Sensor': 11.55,
-    'Motion Sensor': 22.58,
-    'Glass Break Sensor': 33.60,
-    'Smoke Detector': 33.60,
-    'CO Detector': 39.00,
-    'Outdoor Camera': 113.32,
-    'Indoor Camera': 82.70,
-    'Video Doorbell': 107.49,
-    'Smart Lock': 118.88,
-    'Smart Thermostat': 87.14,
-    'Garage Door Control': 84.21
-};
-
-const laborRates = {
-    'Install (5pt system)': 150,
-    'Outdoor Camera': 50,
-    'Indoor Camera': 50,
-    'Door Lock': 35,
-    'Doorbell': 35,
-    'Thermostat': 35
+    'ADT 7" Command Panel Wireless': 173.25,
+    'ADT Hybrid Panel Hardwired': 99.75,
+    'Command Panel Verizon LTE Radio': 52.50,
+    'Command Panel AT&T LTE Radio': 52.50,
+    'Command 2-Way Mini Wireless Sensor': 11.55,
+    'Command 2-Way Wireless Sensor': 11.24,
+    'Command 2-Way Wireless Motion Sensor': 22.58,
+    'Command 2-Way Wireless Keyfob': 11.55,
+    'Prewire/Hardwired Door Contact': 3.36,
+    'Prewire/Hardwired Window Contact': 3.36,
+    'Rollup Door Sensor': 38.75,
+    'Command 2-Way Wireless Glassbreak Sensor': 33.60,
+    'Command 2-Way Wireless Emergency Panic Button': 27.00,
+    'Command 2-Way Wireless Flood Sensor': 45.00,
+    'Command 2-Way Shock Sensor': 17.50,
+    'Command 2-Way Wireless Smoke Detector': 33.60,
+    'Command 2-Way Wireless Carbon Monoxide Detector': 39.00,
+    'Command 2-Way Wireless Smoke & Carbon Combo': 82.00,
+    'Command Panel Wireless to Wireless Translator': 50.00,
+    'Command Panel Hardwire to Wireless Translator': 52.50,
+    'Command Panel Outdoor Camera': 113.32,
+    'Command Panel Indoor Camera': 82.70,
+    'Command Panel 1080P Outdoor Camera': 164.99,
+    'Command Panel 1080P Indoor Camera': 117.42,
+    'Command Panel Doorbell': 107.49,
+    'Ring Doorbell Wireless 2 Camera': 157.16,
+    'Ring Doorbell Wireless Chime': 48.75,
+    'Ring Doorbell Wireless Chime Pro': 61.25,
+    'WiFi Repeater': 47.50,
+    'Command Panel Garage Door Control': 84.21,
+    'Command Panel Garage Door Control MYQ Liftmaster': 54.21,
+    'Command Panel Z-Wave Lamp Module': 31.29,
+    'Command Panel Z-Wave Lightbulb': 31.24,
+    'Command Panel Z-Wave Thermostat': 87.14,
+    'Command Panel Z-Wave Wall Dimmer Switch': 37.49,
+    'Command Panel Z-Wave Kwikset Door Lock - Bronze': 118.88,
+    'Command Panel Z-Wave Kwikset Door Lock - Gold': 118.88,
+    'Command Panel Z-Wave Kwikset Door Lock - Silver': 118.88,
+    '7" Secondary Touchscreen Keypad': 105.00,
+    '7" Secondary Touchscreen Deskmount Kit': 24.99,
+    '7" Secondary Touchscreen Wallmount Kit': 27.49,
+    'Command Panel Deskmount': 18.74,
+    'Hybrid Panel Hardwired Keypad': 40.00,
+    'Wireless Touchpad': 62.50
 };
 
 function showLogin() {
@@ -353,12 +408,14 @@ function closeLogin() {
 }
 
 function login() {
-    if (document.getElementById('login-password').value === DEALER_PASSWORD) {
+    const pwd = document.getElementById('login-password').value;
+    if (pwd === DEALER_PASSWORD) {
         document.getElementById('main-content').style.display = 'none';
         document.getElementById('main-header').style.display = 'none';
         document.getElementById('dashboard').classList.add('active');
         closeLogin();
-        addEquipment();
+        initializeEquipment();
+        calculate();
     } else {
         alert('Incorrect password');
     }
@@ -370,84 +427,178 @@ function logout() {
     document.getElementById('dashboard').classList.remove('active');
 }
 
-function addEquipment() {
+function initializeEquipment() {
     const list = document.getElementById('equipmentList');
-    const id = equipmentCounter++;
+    list.innerHTML = '';
     
-    const div = document.createElement('div');
-    div.className = 'equipment-item';
-    div.id = `equip-${id}`;
-    div.innerHTML = `
-        <select onchange="updateEquipmentCost(${id})">
-            <option value="">Select Equipment</option>
-            ${Object.keys(equipmentPrices).map(name => 
-                `<option value="${name}">${name}</option>`
-            ).join('')}
-        </select>
-        <input type="number" placeholder="Cost ($)" id="cost-${id}" step="0.01" min="0" onchange="calculate()">
-        <input type="number" placeholder="Price ($)" id="price-${id}" step="0.01" min="0" onchange="calculate()">
-        <button onclick="removeEquipment(${id})">Remove</button>
-    `;
-    list.appendChild(div);
+    Object.entries(equipmentPrices).forEach(([name, cost]) => {
+        const safeId = name.replace(/[^a-zA-Z0-9]/g, '');
+        const div = document.createElement('div');
+        div.className = 'equipment-item';
+        div.id = 'item-' + safeId;
+        div.innerHTML = `
+            <div>
+                <label>${name}</label>
+                <div class="cost">Cost: $${cost.toFixed(2)}</div>
+            </div>
+            <input type="number" id="qty-${safeId}" value="0" min="0" max="20" style="width: 100%;">
+            <input type="number" id="price-${safeId}" placeholder="$0.00" step="<function_calls>
+<invoke name="artifacts">
+<parameter name="command">update</parameter>
+<parameter name="id">dps-commission-calc</parameter>
+<parameter name="old_str">            <input type="number" id="price-${safeId}" placeholder="$0.00" step="</parameter>
+<parameter name="new_str">            <input type="number" id="price-${safeId}" placeholder="$0.00" step="0.01" min="0" style="width: 100%;">
+            <div class="subtotal" id="sub-${safeId}">$0.00</div>
+        `;
+        list.appendChild(div);
+    });
+    
+    document.querySelectorAll('.equipment-item input').forEach(input => {
+        input.addEventListener('change', () => {
+            const safeId = input.id.replace('qty-', '').replace('price-', '');
+            updateItem(safeId);
+        });
+    });
 }
 
-function updateEquipmentCost(id) {
-    const select = document.querySelector(`#equip-${id} select`);
-    const costInput = document.getElementById(`cost-${id}`);
-    const priceInput = document.getElementById(`price-${id}`);
+function updateItem(safeId) {
+    const itemDiv = document.getElementById('item-' + safeId);
+    const qtyInput = document.getElementById('qty-' + safeId);
     
-    if (select.value && equipmentPrices[select.value]) {
-        const cost = equipmentPrices[select.value];
-        costInput.value = cost.toFixed(2);
-        priceInput.value = (cost * 1.5).toFixed(2); // Default 50% markup
+    if (itemDiv && qtyInput) {
+        const qty = parseInt(qtyInput.value) || 0;
+        if (qty > 0) {
+            itemDiv.classList.add('has-qty');
+        } else {
+            itemDiv.classList.remove('has-qty');
+        }
     }
+    
     calculate();
 }
 
-function removeEquipment(id) {
-    document.getElementById(`equip-${id}`).remove();
-    calculate();
+function detectPackage(hasCamera, hasPulseFeatures, totalEquipment) {
+    if (hasCamera || hasPulseFeatures) {
+        if (totalEquipment > 10) {
+            return 'Complete Protection';
+        } else {
+            return 'Pulse Smart Home';
+        }
+    } else if (totalEquipment > 0) {
+        return 'Bundle Package';
+    }
+    return 'Basic';
 }
 
 function calculate() {
     const monthlyRate = parseFloat(document.getElementById('monthlyRate').value);
-    const creditClass = document.getElementById('creditClass').value;
     const baseMultiple = parseFloat(document.getElementById('baseMultiple').value);
-    const installFee = parseFloat(document.getElementById('installFee').value);
-    const upsellAmount = parseFloat(document.getElementById('upsellAmount').value);
+    const upsellAmount = parseFloat(document.getElementById('upsellAmount').value) || 0;
     
-    // Calculate equipment totals
     let totalEquipmentCost = 0;
     let totalEquipmentPrice = 0;
-    const equipItems = document.querySelectorAll('.equipment-item');
-    equipItems.forEach(item => {
-        const cost = parseFloat(item.querySelector('[id^="cost-"]')?.value || 0);
-        const price = parseFloat(item.querySelector('[id^="price-"]')?.value || 0);
-        totalEquipmentCost += cost;
-        totalEquipmentPrice += price;
+    let cameraCount = 0;
+    let lockCount = 0;
+    let doorbellCount = 0;
+    let thermostatCount = 0;
+    let totalItems = 0;
+    let hasPulseFeatures = false;
+    
+    Object.entries(equipmentPrices).forEach(([name, cost]) => {
+        const safeId = name.replace(/[^a-zA-Z0-9]/g, '');
+        const qtyInput = document.getElementById('qty-' + safeId);
+        const priceInput = document.getElementById('price-' + safeId);
+        const subtotalDiv = document.getElementById('sub-' + safeId);
+        
+        if (qtyInput && priceInput && subtotalDiv) {
+            const qty = parseInt(qtyInput.value) || 0;
+            const price = parseFloat(priceInput.value) || 0;
+            
+            const itemCost = cost * qty;
+            const itemRevenue = price * qty;
+            
+            totalEquipmentCost += itemCost;
+            totalEquipmentPrice += itemRevenue;
+            totalItems += qty;
+            
+            subtotalDiv.textContent = '$' + itemCost.toFixed(2);
+            
+            const lowerName = name.toLowerCase();
+            if (lowerName.includes('camera') && qty > 0) {
+                cameraCount += qty;
+                hasPulseFeatures = true;
+            }
+            if (lowerName.includes('lock') && qty > 0) {
+                lockCount += qty;
+                hasPulseFeatures = true;
+            }
+            if (lowerName.includes('doorbell') && qty > 0) {
+                doorbellCount += qty;
+                hasPulseFeatures = true;
+            }
+            if (lowerName.includes('thermostat') && qty > 0) {
+                thermostatCount += qty;
+                hasPulseFeatures = true;
+            }
+            if ((lowerName.includes('z-wave') || lowerName.includes('smart')) && qty > 0) {
+                hasPulseFeatures = true;
+            }
+        }
     });
     
-    // Calculate labor costs
-    let laborCost = 150; // Base install
-    equipItems.forEach(item => {
-        const select = item.querySelector('select');
-        if (select.value.includes('Camera')) laborCost += 50;
-        if (select.value.includes('Lock')) laborCost += 35;
-        if (select.value.includes('Doorbell')) laborCost += 35;
-        if (select.value.includes('Thermostat')) laborCost += 35;
-    });
+    const detectedPackage = detectPackage(cameraCount > 0, hasPulseFeatures, totalItems);
+    document.getElementById('detectedPackage').textContent = detectedPackage;
     
-    // Gross commission calculation
+    let laborCost = 150;
+    const laborCamerasCost = cameraCount * 50;
+    const laborLocksCost = lockCount * 35;
+    const laborDoorbellsCost = doorbellCount * 35;
+    const laborThermostatsCost = thermostatCount * 35;
+    
+    laborCost += laborCamerasCost + laborLocksCost + laborDoorbellsCost + laborThermostatsCost;
+    
+    document.getElementById('laborBase').style.display = 'flex';
+    
+    if (cameraCount > 0) {
+        document.getElementById('laborCameras').style.display = 'flex';
+        document.getElementById('laborCameraText').textContent = `• Cameras (${cameraCount} × $50):`;
+        document.getElementById('laborCameraAmount').textContent = '-$' + laborCamerasCost.toFixed(2);
+    } else {
+        document.getElementById('laborCameras').style.display = 'none';
+    }
+    
+    if (lockCount > 0) {
+        document.getElementById('laborLocks').style.display = 'flex';
+        document.getElementById('laborLockText').textContent = `• Locks (${lockCount} × $35):`;
+        document.getElementById('laborLockAmount').textContent = '-$' + laborLocksCost.toFixed(2);
+    } else {
+        document.getElementById('laborLocks').style.display = 'none';
+    }
+    
+    if (doorbellCount > 0) {
+        document.getElementById('laborDoorbells').style.display = 'flex';
+        document.getElementById('laborDoorbellText').textContent = `• Doorbells (${doorbellCount} × $35):`;
+        document.getElementById('laborDoorbellAmount').textContent = '-$' + doorbellsCost.toFixed(2);
+    } else {
+        document.getElementById('laborDoorbells').style.display = 'none';
+    }
+    
+    if (thermostatCount > 0) {
+        document.getElementById('laborThermostats').style.display = 'flex';
+        document.getElementById('laborThermostatText').textContent = `• Thermostats (${thermostatCount} × $35):`;
+        document.getElementById('laborThermostatAmount').textContent = '-$' + laborThermostatsCost.toFixed(2);
+    } else {
+        document.getElementById('laborThermostats').style.display = 'none';
+    }
+    
     const grossCommission = monthlyRate * baseMultiple;
+    const dpsDeduction = 200;
+    const holdbackDeduction = monthlyRate * 1.5;
     
-    // Deductions
-    const dpsDeduction = 200; // Per contract
-    const holdbackDeduction = monthlyRate * 1.5; // ADT holdback
-    
+    const equipmentMarkup = totalEquipmentPrice - totalEquipmentCost;
     const totalDeductions = dpsDeduction + holdbackDeduction + totalEquipmentCost + laborCost;
-    const netCommission = grossCommission - totalDeductions + upsellAmount + (totalEquipmentPrice - totalEquipmentCost);
+    const netCommission = grossCommission - totalDeductions + equipmentMarkup + upsellAmount;
     
-    // Update UI
     document.getElementById('grossCommission').textContent = '$' + grossCommission.toFixed(2);
     document.getElementById('dpsDeduction').textContent = '-$' + dpsDeduction.toFixed(2);
     document.getElementById('holdbackDeduction').textContent = '-$' + holdbackDeduction.toFixed(2);
@@ -456,15 +607,18 @@ function calculate() {
     document.getElementById('totalDeductions').textContent = '-$' + totalDeductions.toFixed(2);
     document.getElementById('netCommission').textContent = '$' + netCommission.toFixed(2);
     document.getElementById('monthlyMRR').textContent = '$' + monthlyRate.toFixed(2);
-    document.getElementById('upsellProfit').textContent = '$' + (upsellAmount + (totalEquipmentPrice - totalEquipmentCost)).toFixed(2);
+    document.getElementById('equipmentProfit').textContent = '$' + (equipmentMarkup + upsellAmount).toFixed(2);
 }
 
 function exportOrders() {
-    if (orders.length === 0) return alert('No orders to export');
+    if (orders.length === 0) {
+        alert('No orders to export');
+        return;
+    }
     
     const csv = [
-        ['Date', 'Monthly Rate', 'Credit Class', 'Gross Commission', 'Net Commission', 'Equipment Cost', 'Upsell'].join(','),
-        ...orders.map(o => [o.date, o.monthlyRate, o.creditClass, o.grossCommission, o.netCommission, o.equipmentCost, o.upsell].join(','))
+        ['Date', 'Package', 'Monthly Rate', 'Credit Class', 'Gross Commission', 'Net Commission', 'Equipment Cost'].join(','),
+        ...orders.map(o => [o.date, o.package, o.monthlyRate, o.creditClass, o.grossCommission, o.netCommission, o.equipmentCost].join(','))
     ].join('\n');
     
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -481,10 +635,10 @@ document.getElementById('creditClass').addEventListener('change', calculate);
 document.getElementById('baseMultiple').addEventListener('input', calculate);
 document.getElementById('installFee').addEventListener('input', calculate);
 document.getElementById('upsellAmount').addEventListener('input', calculate);
-document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
-
-calculate();
+document.getElementById('login-password').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') login();
+});
 </script>
 
 </body>
-</html>
+</html></parameter>
