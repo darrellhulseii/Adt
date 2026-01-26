@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Protection Security | ADT Authorized Dealer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; line-height: 1.6; }
+        
+        header { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; padding: 20px 40px; position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0, 61, 130, 0.3); }
+        .header-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+        .logo-text { font-size: 1.4em; font-weight: 700; color: white; }
+        .hamburger { display: none; cursor: pointer; font-size: 28px; color: white; }
+        nav ul { list-style: none; display: flex; gap: 25px; }
+        nav a { color: white; text-decoration: none; font-weight: 600; transition: all 0.3s; padding: 8px 16px; border-radius: 6px; }
+        nav a:hover { background: rgba(255, 255, 255, 0.2); }
+        
+        .hero { background: linear-gradient(135deg, #003d82 0%, #0057b8 50%, #0069d9 100%); color: white; text-align: center; padding: 180px 40px 100px; }
+        .hero h1 { font-size: 3.2em; margin-bottom: 25px; }
+        .hero p { font-size: 1.3em; margin: 20px auto; max-width: 700px; }
+        
+        .btn { background: linear-gradient(135deg, #0069d9 0%, #0057b8 100%); color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block; margin: 10px; box-shadow: 0 6px 20px rgba(0, 89, 184, 0.3); transition: all 0.3s; border: none; cursor: pointer; font-size: 1em; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 89, 184, 0.4); }
+        .btn-secondary { background: white; color: #0057b8; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.9); }
+        
+        section { padding: 100px 40px; max-width: 1400px; margin: 0 auto; }
+        h2 { color: #003d82; font-size: 2.5em; margin-bottom: 40px; text-align: center; position: relative; padding-bottom: 20px; }
+        h2::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background: linear-gradient(90deg, #003d82, #0069d9); border-radius: 2px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 60px; }
+        .card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 30px rgba(0, 61, 130, 0.08); transition: all 0.3s; border: 2px solid transparent; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 16px 50px rgba(0, 61, 130, 0.15); border-color: #0069d9; }
+        .card h3 { color: #003d82; font-size: 1.8em; margin-bottom: 15px; }
+        .price { font-size: 2.5em; color: #0057b8; font-weight: 700; margin: 20px 0; }
+        
+        .features { list-style: none; padding: 0; margin: 25px 0; }
+        .features li { margin: 15px 0; padding-left: 30px; position: relative; font-size: 1.05em; color: #333; }
+        .features li:before { content: '✓'; color: #0069d9; position: absolute; left: 0; font-weight: bold; font-size: 1.3em; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 61, 130, 0.9); justify-content: center; align-items: center; z-index: 2000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 50px; border-radius: 20px; max-width: 500px; width: 90%; box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3); text-align: center; }
+        
+        #dashboard { display: none; min-height: 100vh; background: #f1f3f5; padding-top: 80px; }
+        #dashboard.active { display: block; }
+        .dashboard-header { background: white; padding: 30px 40px; box-shadow: 0 2px 10px rgba(0, 61, 130, 0.1); margin-bottom: 30px; }
+        .dashboard-content { max-width: 1600px; margin: 0 auto; padding: 0 40px 60px; }
+        
+        .calculator-section { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 30px rgba(0, 61, 130, 0.08); margin-bottom: 40px; }
+        .calc-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 30px; }
+        
+        .input-group { margin-bottom: 20px; }
+        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #003d82; font-size: 0.95em; }
+        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s; }
+        .input-group input:focus, .input-group select:focus { outline: none; border-color: #0069d9; box-shadow: 0 0 0 3px rgba(0, 105, 217, 0.1); }
+        
+        .equipment-section { background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0; }
+        .equipment-item { display: grid; grid-template-columns: 2fr 1fr 1fr 80px; gap: 15px; align-items: center; margin-bottom: 15px; padding: 15px; background: white; border-radius: 8px; border: 1px solid #e9ecef; }
+        .equipment-item input { padding: 10px; }
+        .equipment-item button { background: #dc3545; color: white; border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+        .equipment-item button:hover { background: #c82333; }
+        
+        .results-panel { background: linear-gradient(135deg, #003d82 0%, #0069d9 100%); color: white; padding: 30px; border-radius: 16px; position: sticky; top: 100px; }
+        .result-item { margin: 15px 0; padding: 20px; background: rgba(255, 255, 255, 0.15); border-radius: 12px; }
+        .result-item h3 { font-size: 0.95em; margin-bottom: 8px; font-weight: 600; opacity: 0.9; }
+        .result-item .value { font-size: 2em; font-weight: 700; }
+        .result-item.small .value { font-size: 1.5em; }
+        
+        .deductions-breakdown { background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 12px; margin-top: 20px; }
+        .deduction-line { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+        .deduction-line:last-child { border-bottom: none; font-weight: 700; font-size: 1.1em; }
+        
+        .saved-orders { margin-top: 40px; background: #f8f9fa; padding: 40px; border-radius: 16px; border: 2px solid #e9ecef; }
+        .order-item { background: white; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 61, 130, 0.06); border-left: 4px solid #0069d9; }
+        
+        .btn-add { background: #28a745; margin-top: 10px; }
+        .btn-add:hover { background: #218838; }
+        .logout-btn { background: #6c757d; padding: 10px 30px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: 600; }
+        
+        footer { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; text-align: center; padding: 60px 40px; }
+        
+        @media(max-width: 1024px) {
+            .calc-grid { grid-template-columns: 1fr; }
+            .results-panel { position: static; }
+            .equipment-item { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<header id="main-header">
+    <div class="header-container">
+        <div class="logo-text">Direct Protection Security</div>
+        <div class="hamburger" onclick="document.querySelector('nav ul').classList.toggle('active')">☰</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#packages">Packages</a></li>
+                <li><a href="#" onclick="showLogin()">Dealer Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="main-content">
+    <section id="home" class="hero">
+        <div>
+            <h1>America's Most Trusted Security</h1>
+            <p>Professional monitoring and smart home protection for your family</p>
+            <p>ADT has been protecting homes for over 145 years</p>
+            <a href="#packages" class="btn">View Packages</a>
+            <a href="tel:+14089094484" class="btn btn-secondary">Call (408) 909-4484</a>
+        </div>
+    </section>
+
+    <section id="packages">
+        <h2>Security Packages</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Bundle Package</h3>
+                <div class="price">$42.99<span style="font-size:0.4em">/mo</span></div>
+                <ul class="features">
+                    <li>Door & Window Sensors</li>
+                    <li>Motion Detectors</li>
+                    <li>24/7 Professional Monitoring</li>
+                    <li>Mobile App Control</li>
+                </ul>
+                <a href="tel:+14089094484" class="btn">Get Started</a>
+            </div>
+            
+            <div class="card">
+                <h3>Pulse Smart Home</h3>
+                <div class="price">$52.99<span style="font-size:0.4em">/mo</span></div>
+                <ul class="features">
+                    <li>Everything in Bundle</li>
+                    <li>HD Video Cameras</li>
+                    <li>Smart Home Automation</li>
+                    <li>Remote Access & Control</li>
+                </ul>
+                <a href="tel:+14089094484" class="btn">Get Started</a>
+            </div>
+            
+            <div class="card">
+                <h3>Complete Protection</h3>
+                <div class="price">$62.99<span style="font-size:0.4em">/mo</span></div>
+                <ul class="features">
+                    <li>Everything in Pulse</li>
+                    <li>Multiple Cameras</li>
+                    <li>Advanced Automation</li>
+                    <li>Premium Support</li>
+                </ul>
+                <a href="tel:+14089094484" class="btn">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="font-size:1.3em; margin-bottom:20px; font-weight:600">&copy; 2025 Direct Protection Security</p>
+        <p>Authorized ADT Dealer</p>
+    </footer>
+</div>
+
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <h2>Dealer Login</h2>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="Enter password">
+        </div>
+        <button class="btn" onclick="login()">Login</button>
+        <button class="btn" onclick="closeLogin()" style="background:#6c757d; margin-top:10px">Cancel</button>
+    </div>
+</div>
+
+<div id="dashboard">
+    <div class="dashboard-header">
+        <div style="max-width:1600px; margin:0 auto; display:flex; justify-content:space-between; align-items:center">
+            <div>
+                <h1>Dealer Dashboard</h1>
+                <p style="color:#666">Commission Calculator & Order Management</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="dashboard-content">
+        <div class="calculator-section">
+            <h2>Commission Calculator</h2>
+            
+            <div style="margin-bottom: 30px; padding: 20px; background: #e7f3ff; border-left: 4px solid #0069d9; border-radius: 8px;">
+                <div class="input-group">
+                    <label>Base Multiple (Admin Setting)</label>
+                    <input type="number" id="baseMultiple" value="35" step="0.5" style="max-width: 150px;">
+                    <small style="color: #666; display: block; margin-top: 5px;">Adjust this to change commission calculations across all deals</small>
+                </div>
+            </div>
+            
+            <div class="calc-grid">
+                <div>
+                    <div class="input-group">
+                        <label>Monthly Rate ($)</label>
+                        <select id="monthlyRate">
+                            <option value="42.99">$42.99 - Res-Bundle 2</option>
+                            <option value="44.99">$44.99 - Res-Bundle 2A</option>
+                            <option value="47.99">$47.99 - Res-Bundle GSM</option>
+                            <option value="49.99">$49.99 - Res-Pulse 1A</option>
+                            <option value="52.99">$52.99 - Res-Pulse 1A</option>
+                            <option value="53.99">$53.99 - Res-Pulse 1B</option>
+                            <option value="58.99">$58.99 - Res-Pulse 2A</option>
+                            <option value="59.99">$59.99 - Res-Pulse 3A/2B</option>
+                            <option value="60.99">$60.99 - Res-Pulse 3B</option>
+                            <option value="63.99">$63.99 - Res-Pulse 2B</option>
+                            <option value="64.99">$64.99 - Res-Pulse 3B</option>
+                            <option value="45.99">$45.99 - Comm-Bundle 4</option>
+                            <option value="51.99">$51.99 - Comm-Pulse 1C</option>
+                            <option value="58.99">$58.99 - Comm-Pulse 2C</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Credit Score Class</label>
+                        <select id="creditClass">
+                            <option value="A+">A+ (775+) - ACH Required</option>
+                            <option value="A">A (725-774) - ACH Required</option>
+                            <option value="B">B (675-724) - ACH Required</option>
+                            <option value="B-">B- (650-674) - ACH Required</option>
+                            <option value="D">D (625-649) - ACH Required</option>
+                            <option value="E">E (600-624) - ACH Required</option>
+                            <option value="BULK">BULK (575-599)</option>
+                            <option value="COMM">Commercial (>75)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Installation Fee ($)</label>
+                        <input type="number" id="installFee" value="150" step="10" min="0">
+                        <small style="color: #666; display: block; margin-top: 5px;">Minimum: $150 (per contract)</small>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Upsell Amount ($)</label>
+                        <input type="number" id="upsellAmount" value="0" step="10" min="0">
+                        <small style="color: #666; display: block; margin-top: 5px;">100% retained by contractor (max 50% markup on equipment)</small>
+                    </div>
+                    
+                    <div class="equipment-section">
+                        <h3 style="margin-bottom: 20px; color: #003d82;">Equipment Customization</h3>
+                        <div id="equipmentList"></div>
+                        <button class="btn btn-add" onclick="addEquipment()">+ Add Equipment</button>
+                    </div>
+                    
+                    <button class="btn" onclick="calculate()" style="width:100%; margin-top:20px; font-size: 1.1em;">Calculate Commission</button>
+                </div>
+                
+                <div class="results-panel">
+                    <div class="result-item">
+                        <h3>Gross Commission</h3>
+                        <div class="value" id="grossCommission">$0.00</div>
+                    </div>
+                    
+                    <div class="deductions-breakdown">
+                        <h4 style="margin-bottom: 15px; font-size: 1.1em;">Deductions Breakdown</h4>
+                        <div class="deduction-line">
+                            <span>DPS Install Fee:</span>
+                            <span id="dpsDeduction">-$200.00</span>
+                        </div>
+                        <div class="deduction-line">
+                            <span>ADT Holdback (1.5x):</span>
+                            <span id="holdbackDeduction">-$0.00</span>
+                        </div>
+                        <div class="deduction-line">
+                            <span>Equipment Cost:</span>
+                            <span id="equipmentCost">-$0.00</span>
+                        </div>
+                        <div class="deduction-line">
+                            <span>Installation Labor:</span>
+                            <span id="laborCost">-$0.00</span>
+                        </div>
+                        <div class="deduction-line" style="margin-top: 15px; padding-top: 15px; border-top: 2px solid rgba(255,255,255,0.3);">
+                            <span>Total Deductions:</span>
+                            <span id="totalDeductions">-$200.00</span>
+                        </div>
+                    </div>
+                    
+                    <div class="result-item" style="background: rgba(40, 167, 69, 0.2); border: 2px solid rgba(40, 167, 69, 0.5);">
+                        <h3>NET COMMISSION</h3>
+                        <div class="value" id="netCommission">$0.00</div>
+                    </div>
+                    
+                    <div class="result-item small">
+                        <h3>Monthly Recurring Revenue</h3>
+                        <div class="value" id="monthlyMRR">$42.99</div>
+                    </div>
+                    
+                    <div class="result-item small">
+                        <h3>Upsell Profit (100%)</h3>
+                        <div class="value" id="upsellProfit">$0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="saved-orders">
+            <h3 style="color: #003d82; margin-bottom: 25px; font-size: 1.8em;">Saved Quotes</h3>
+            <div id="ordersList"><p style="text-align:center; color:#999; padding:20px">No quotes saved yet</p></div>
+            <button class="btn" onclick="exportOrders()" style="margin-top:20px">Export to CSV</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const DEALER_PASSWORD = "ADT2025";
+let orders = [];
+let equipmentCounter = 0;
+
+const equipmentPrices = {
+    'ADT 7" Command Panel': 173.25,
+    'ADT Hybrid Panel': 99.75,
+    'LTE Radio (Verizon)': 52.50,
+    'LTE Radio (AT&T)': 52.50,
+    'Door/Window Sensor': 11.55,
+    'Motion Sensor': 22.58,
+    'Glass Break Sensor': 33.60,
+    'Smoke Detector': 33.60,
+    'CO Detector': 39.00,
+    'Outdoor Camera': 113.32,
+    'Indoor Camera': 82.70,
+    'Video Doorbell': 107.49,
+    'Smart Lock': 118.88,
+    'Smart Thermostat': 87.14,
+    'Garage Door Control': 84.21
+};
+
+const laborRates = {
+    'Install (5pt system)': 150,
+    'Outdoor Camera': 50,
+    'Indoor Camera': 50,
+    'Door Lock': 35,
+    'Doorbell': 35,
+    'Thermostat': 35
+};
+
+function showLogin() {
+    document.getElementById('login-modal').classList.add('active');
+}
+
+function closeLogin() {
+    document.getElementById('login-modal').classList.remove('active');
+    document.getElementById('login-password').value = '';
+}
+
+function login() {
+    if (document.getElementById('login-password').value === DEALER_PASSWORD) {
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        closeLogin();
+        addEquipment();
+    } else {
+        alert('Incorrect password');
+    }
+}
+
+function logout() {
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('main-header').style.display = 'block';
+    document.getElementById('dashboard').classList.remove('active');
+}
+
+function addEquipment() {
+    const list = document.getElementById('equipmentList');
+    const id = equipmentCounter++;
+    
+    const div = document.createElement('div');
+    div.className = 'equipment-item';
+    div.id = `equip-${id}`;
+    div.innerHTML = `
+        <select onchange="updateEquipmentCost(${id})">
+            <option value="">Select Equipment</option>
+            ${Object.keys(equipmentPrices).map(name => 
+                `<option value="${name}">${name}</option>`
+            ).join('')}
+        </select>
+        <input type="number" placeholder="Cost ($)" id="cost-${id}" step="0.01" min="0" onchange="calculate()">
+        <input type="number" placeholder="Price ($)" id="price-${id}" step="0.01" min="0" onchange="calculate()">
+        <button onclick="removeEquipment(${id})">Remove</button>
+    `;
+    list.appendChild(div);
+}
+
+function updateEquipmentCost(id) {
+    const select = document.querySelector(`#equip-${id} select`);
+    const costInput = document.getElementById(`cost-${id}`);
+    const priceInput = document.getElementById(`price-${id}`);
+    
+    if (select.value && equipmentPrices[select.value]) {
+        const cost = equipmentPrices[select.value];
+        costInput.value = cost.toFixed(2);
+        priceInput.value = (cost * 1.5).toFixed(2); // Default 50% markup
+    }
+    calculate();
+}
+
+function removeEquipment(id) {
+    document.getElementById(`equip-${id}`).remove();
+    calculate();
+}
+
+function calculate() {
+    const monthlyRate = parseFloat(document.getElementById('monthlyRate').value);
+    const creditClass = document.getElementById('creditClass').value;
+    const baseMultiple = parseFloat(document.getElementById('baseMultiple').value);
+    const installFee = parseFloat(document.getElementById('installFee').value);
+    const upsellAmount = parseFloat(document.getElementById('upsellAmount').value);
+    
+    // Calculate equipment totals
+    let totalEquipmentCost = 0;
+    let totalEquipmentPrice = 0;
+    const equipItems = document.querySelectorAll('.equipment-item');
+    equipItems.forEach(item => {
+        const cost = parseFloat(item.querySelector('[id^="cost-"]')?.value || 0);
+        const price = parseFloat(item.querySelector('[id^="price-"]')?.value || 0);
+        totalEquipmentCost += cost;
+        totalEquipmentPrice += price;
+    });
+    
+    // Calculate labor costs
+    let laborCost = 150; // Base install
+    equipItems.forEach(item => {
+        const select = item.querySelector('select');
+        if (select.value.includes('Camera')) laborCost += 50;
+        if (select.value.includes('Lock')) laborCost += 35;
+        if (select.value.includes('Doorbell')) laborCost += 35;
+        if (select.value.includes('Thermostat')) laborCost += 35;
+    });
+    
+    // Gross commission calculation
+    const grossCommission = monthlyRate * baseMultiple;
+    
+    // Deductions
+    const dpsDeduction = 200; // Per contract
+    const holdbackDeduction = monthlyRate * 1.5; // ADT holdback
+    
+    const totalDeductions = dpsDeduction + holdbackDeduction + totalEquipmentCost + laborCost;
+    const netCommission = grossCommission - totalDeductions + upsellAmount + (totalEquipmentPrice - totalEquipmentCost);
+    
+    // Update UI
+    document.getElementById('grossCommission').textContent = '$' + grossCommission.toFixed(2);
+    document.getElementById('dpsDeduction').textContent = '-$' + dpsDeduction.toFixed(2);
+    document.getElementById('holdbackDeduction').textContent = '-$' + holdbackDeduction.toFixed(2);
+    document.getElementById('equipmentCost').textContent = '-$' + totalEquipmentCost.toFixed(2);
+    document.getElementById('laborCost').textContent = '-$' + laborCost.toFixed(2);
+    document.getElementById('totalDeductions').textContent = '-$' + totalDeductions.toFixed(2);
+    document.getElementById('netCommission').textContent = '$' + netCommission.toFixed(2);
+    document.getElementById('monthlyMRR').textContent = '$' + monthlyRate.toFixed(2);
+    document.getElementById('upsellProfit').textContent = '$' + (upsellAmount + (totalEquipmentPrice - totalEquipmentCost)).toFixed(2);
+}
+
+function exportOrders() {
+    if (orders.length === 0) return alert('No orders to export');
+    
+    const csv = [
+        ['Date', 'Monthly Rate', 'Credit Class', 'Gross Commission', 'Net Commission', 'Equipment Cost', 'Upsell'].join(','),
+        ...orders.map(o => [o.date, o.monthlyRate, o.creditClass, o.grossCommission, o.netCommission, o.equipmentCost, o.upsell].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'dps_commissions_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+document.getElementById('monthlyRate').addEventListener('change', calculate);
+document.getElementById('creditClass').addEventListener('change', calculate);
+document.getElementById('baseMultiple').addEventListener('input', calculate);
+document.getElementById('installFee').addEventListener('input', calculate);
+document.getElementById('upsellAmount').addEventListener('input', calculate);
+document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+
+calculate();
+</script>
+
+</body>
+</html>
