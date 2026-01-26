@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Direct Protection Security | ADT Authorized Dealer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; line-height: 1.6; }
+        
+        header { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; padding: 20px 40px; position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0, 61, 130, 0.3); }
+        .header-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
+        .logo-text { font-size: 1.4em; font-weight: 700; color: white; }
+        .hamburger { display: none; cursor: pointer; font-size: 28px; color: white; }
+        nav ul { list-style: none; display: flex; gap: 25px; }
+        nav a { color: white; text-decoration: none; font-weight: 600; transition: all 0.3s; padding: 8px 16px; border-radius: 6px; }
+        nav a:hover { background: rgba(255, 255, 255, 0.2); }
+        
+        .hero { background: linear-gradient(135deg, #003d82 0%, #0057b8 50%, #0069d9 100%); color: white; text-align: center; padding: 180px 40px 100px; }
+        .hero h1 { font-size: 3.2em; margin-bottom: 25px; }
+        .hero p { font-size: 1.3em; margin: 20px auto; max-width: 700px; }
+        
+        .btn { background: linear-gradient(135deg, #0069d9 0%, #0057b8 100%); color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block; margin: 10px; box-shadow: 0 6px 20px rgba(0, 89, 184, 0.3); transition: all 0.3s; border: none; cursor: pointer; font-size: 1em; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 89, 184, 0.4); }
+        .btn-secondary { background: white; color: #0057b8; }
+        .btn-secondary:hover { background: rgba(255, 255, 255, 0.9); }
+        
+        section { padding: 100px 40px; max-width: 1400px; margin: 0 auto; }
+        h2 { color: #003d82; font-size: 2.5em; margin-bottom: 40px; text-align: center; position: relative; padding-bottom: 20px; }
+        h2::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background: linear-gradient(90deg, #003d82, #0069d9); border-radius: 2px; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 60px; }
+        .card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 30px rgba(0, 61, 130, 0.08); transition: all 0.3s; border: 2px solid transparent; }
+        .card:hover { transform: translateY(-8px); box-shadow: 0 16px 50px rgba(0, 61, 130, 0.15); border-color: #0069d9; }
+        .card h3 { color: #003d82; font-size: 1.8em; margin-bottom: 15px; }
+        .price { font-size: 2.5em; color: #0057b8; font-weight: 700; margin: 20px 0; }
+        
+        .features { list-style: none; padding: 0; margin: 25px 0; }
+        .features li { margin: 15px 0; padding-left: 30px; position: relative; font-size: 1.05em; color: #333; }
+        .features li:before { content: '✓'; color: #0069d9; position: absolute; left: 0; font-weight: bold; font-size: 1.3em; }
+        
+        .why-section { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); border-radius: 20px; padding: 60px; }
+        .why-list { list-style: none; padding: 0; max-width: 900px; margin: 40px auto; }
+        .why-list li { margin: 20px 0; padding-left: 40px; position: relative; font-size: 1.15em; color: #333; }
+        .why-list li:before { content: '✓'; color: #0069d9; position: absolute; left: 0; font-weight: bold; font-size: 1.5em; }
+        
+        .contact-section { background: white; border-radius: 20px; padding: 60px; box-shadow: 0 10px 40px rgba(0, 61, 130, 0.1); }
+        .input-group { margin-bottom: 25px; }
+        .input-group label { display: block; margin-bottom: 10px; font-weight: 600; color: #003d82; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s; font-family: 'Inter', sans-serif; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: #0069d9; box-shadow: 0 0 0 3px rgba(0, 105, 217, 0.1); }
+        
+        footer { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; text-align: center; padding: 60px 40px; }
+        footer a { color: #a8d0ff; text-decoration: none; transition: all 0.3s; }
+        footer a:hover { color: white; }
+        
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 61, 130, 0.9); justify-content: center; align-items: center; z-index: 2000; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 50px; border-radius: 20px; max-width: 500px; width: 90%; box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3); text-align: center; }
+        
+        #dashboard { display: none; min-height: 100vh; background: #f1f3f5; padding-top: 80px; }
+        #dashboard.active { display: block; }
+        .dashboard-header { background: white; padding: 30px 40px; box-shadow: 0 2px 10px rgba(0, 61, 130, 0.1); margin-bottom: 30px; }
+        .dashboard-header h1 { color: #003d82; margin-bottom: 10px; }
+        .dashboard-content { max-width: 1400px; margin: 0 auto; padding: 0 40px 60px; }
+        
+        .calculator-section { background: white; border-radius: 16px; padding: 50px; box-shadow: 0 8px 30px rgba(0, 61, 130, 0.08); margin-bottom: 40px; }
+        .calc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 50px; margin-top: 40px; }
+        
+        .results-panel { background: linear-gradient(135deg, #003d82 0%, #0069d9 100%); color: white; padding: 40px; border-radius: 16px; text-align: center; }
+        .result-item { margin: 20px 0; padding: 25px; background: rgba(255, 255, 255, 0.15); border-radius: 12px; }
+        .result-item h3 { font-size: 1.1em; margin-bottom: 10px; font-weight: 600; }
+        .result-item .value { font-size: 2.5em; font-weight: 700; }
+        
+        .saved-orders { margin-top: 40px; background: #f8f9fa; padding: 40px; border-radius: 16px; border: 2px solid #e9ecef; }
+        .saved-orders h3 { color: #003d82; margin-bottom: 25px; font-size: 1.8em; }
+        .order-item { background: white; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 61, 130, 0.06); border-left: 4px solid #0069d9; }
+        .order-item h4 { color: #003d82; margin-bottom: 12px; font-size: 1.3em; }
+        .order-item p { margin: 6px 0; color: #495057; }
+        
+        .btn-delete { background: #dc3545; padding: 8px 20px; border-radius: 6px; font-size: 0.9em; margin-top: 10px; }
+        .btn-delete:hover { background: #c82333; }
+        .logout-btn { background: #6c757d; padding: 10px 30px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .logout-btn:hover { background: #5a6268; }
+        
+        @media(max-width: 768px) {
+            .hamburger { display: block; }
+            nav ul { display: none; flex-direction: column; position: absolute; top: 70px; left: 0; width: 100%; background: #003d82; padding: 20px 0; text-align: center; }
+            nav ul.active { display: flex; }
+            .hero h1 { font-size: 2.2em; }
+            .calc-grid { grid-template-columns: 1fr; }
+            .grid { grid-template-columns: 1fr; }
+            section { padding: 60px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<header id="main-header">
+    <div class="header-container">
+        <div class="logo-text">Direct Protection Security</div>
+        <div class="hamburger" onclick="document.querySelector('nav ul').classList.toggle('active')">☰</div>
+        <nav>
+            <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#packages">Packages</a></li>
+                <li><a href="#why-adt">Why ADT</a></li>
+                <li><a href="#contact">Contact</a></li>
+                <li><a href="#" onclick="showLogin()">Dealer Login</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<div id="main-content">
+    <section id="home" class="hero">
+        <div>
+            <h1>America's Most Trusted Security</h1>
+            <p>Professional monitoring and smart home protection for your family</p>
+            <p>ADT has been protecting homes for over 145 years</p>
+            <a href="#packages" class="btn">View Packages</a>
+            <a href="tel:+14089094484" class="btn btn-secondary">Call (408) 909-4484</a>
+        </div>
+    </section>
+
+    <section id="packages">
+        <h2>Security Packages</h2>
+        <div class="grid">
+            <div class="card">
+                <h3>Basic Protection</h3>
+                <div class="price">$28.99<span style="font-size:0.4em">/mo</span></div>
+                <ul class="features">
+                    <li>Door & Window Sensors</li>
+                    <li>Motion Detectors</li>
+                    <li>24/7 Professional Monitoring</li>
+                    <li>Mobile App Control</li>
+                    <li>Yard Sign & Window Decals</li>
+                    <li>Battery Backup System</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+            
+            <div class="card">
+                <h3>Smart Home</h3>
+                <div class="price">$52.99<span style="font-size:0.4em">/mo</span></div>
+                <ul class="features">
+                    <li>Everything in Basic</li>
+                    <li>HD Video Doorbell Camera</li>
+                    <li>Smart Door Lock</li>
+                    <li>Smart Thermostat</li>
+                    <li>Smart Light Control</li>
+                    <li>Voice Control (Alexa/Google)</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+            
+            <div class="card">
+                <h3>Complete Protection</h3>
+                <div class="price">$62.99<span style="font-size:0.4em">/mo</span></div>
+                <ul class="features">
+                    <li>Everything in Smart Home</li>
+                    <li>Indoor/Outdoor HD Cameras</li>
+                    <li>30-Day Video Storage</li>
+                    <li>Smoke & CO Detection</li>
+                    <li>Water Leak Sensors</li>
+                    <li>Glass Break Sensors</li>
+                    <li>Priority Emergency Response</li>
+                </ul>
+                <a href="#contact" class="btn">Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="why-adt" class="why-section">
+        <h2>Why Choose ADT?</h2>
+        <ul class="why-list">
+            <li><strong>145+ Years of Experience:</strong> America's #1 security company since 1874</li>
+            <li><strong>6 Monitoring Centers:</strong> Redundant nationwide monitoring for maximum reliability</li>
+            <li><strong>Fast Emergency Response:</strong> Average response time under 5 seconds</li>
+            <li><strong>24/7 Professional Monitoring:</strong> Always watching, always ready</li>
+            <li><strong>Smart Home Integration:</strong> Control your entire home from one app</li>
+            <li><strong>Theft Protection Guarantee:</strong> Up to $500 in stolen items coverage</li>
+        </ul>
+    </section>
+
+    <section id="contact">
+        <div class="contact-section">
+            <h2>Get Your Free Quote</h2>
+            <div style="max-width:600px; margin:0 auto">
+                <div class="input-group">
+                    <label>Full Name</label>
+                    <input type="text" placeholder="John Smith">
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" placeholder="john@example.com">
+                </div>
+                <div class="input-group">
+                    <label>Phone</label>
+                    <input type="tel" placeholder="(408) 555-1234">
+                </div>
+                <div class="input-group">
+                    <label>Installation Address</label>
+                    <input type="text" placeholder="123 Main St, City, CA">
+                </div>
+                <div class="input-group">
+                    <label>Preferred Package</label>
+                    <select>
+                        <option>Basic Protection - $28.99/mo</option>
+                        <option>Smart Home - $52.99/mo</option>
+                        <option>Complete Protection - $62.99/mo</option>
+                    </select>
+                </div>
+                <button class="btn" style="width:100%">Request Free Consultation</button>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p style="font-size:1.3em; margin-bottom:20px; font-weight:600">&copy; 2025 Direct Protection Security</p>
+        <p style="margin-bottom:15px">Authorized ADT Dealer</p>
+        <p>
+            <a href="https://www.adt.com/about-adt">About ADT</a> | 
+            <a href="https://www.adt.com/help">Support</a> | 
+            <a href="https://www.adt.com/privacy-policy">Privacy Policy</a>
+        </p>
+    </footer>
+</div>
+
+<div id="login-modal" class="modal">
+    <div class="modal-content">
+        <h2>Dealer Login</h2>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" id="login-password" placeholder="Enter password">
+        </div>
+        <button class="btn" onclick="login()" style="width:100%">Login</button>
+        <button class="btn" onclick="closeLogin()" style="width:100%; background:#6c757d; margin-top:10px">Cancel</button>
+    </div>
+</div>
+
+<div id="dashboard">
+    <div class="dashboard-header">
+        <div style="max-width:1400px; margin:0 auto; display:flex; justify-content:space-between; align-items:center">
+            <div>
+                <h1>Dealer Dashboard</h1>
+                <p style="color:#666">Commission Calculator & Order Management</p>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+    
+    <div class="dashboard-content">
+        <div class="calculator-section">
+            <h2>Commission Calculator</h2>
+            
+            <div class="calc-grid">
+                <div>
+                    <div class="input-group">
+                        <label>Customer Name</label>
+                        <input type="text" id="customerName" placeholder="John Smith">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Customer Address</label>
+                        <input type="text" id="customerAddress" placeholder="123 Main St, City, CA">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Customer Phone</label>
+                        <input type="tel" id="customerPhone" placeholder="(408) 555-1234">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Package Selected</label>
+                        <select id="packageType">
+                            <option value="basic">Basic Protection - $28.99/mo</option>
+                            <option value="smart">Smart Home - $52.99/mo</option>
+                            <option value="complete">Complete Protection - $62.99/mo</option>
+                        </select>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Monthly Rate Override (optional)</label>
+                        <input type="number" id="customRate" placeholder="Enter custom rate" step="0.01">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Commission Per Sale ($)</label>
+                        <input type="number" id="commissionRate" value="500" step="10">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label>Number of Sales</label>
+                        <input type="number" id="salesCount" value="1" min="1">
+                    </div>
+                    
+                    <button class="btn" onclick="calculateAndSave()" style="width:100%; margin-top:20px">Calculate & Save Order</button>
+                </div>
+                
+                <div class="results-panel">
+                    <div class="result-item">
+                        <h3>Commission per Sale</h3>
+                        <div class="value" id="commissionPerSale">$500</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Total Commission</h3>
+                        <div class="value" id="totalCommission">$500</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Monthly Recurring</h3>
+                        <div class="value" id="monthlyRecurring">$28.99</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Weekly Earnings (4 sales)</h3>
+                        <div class="value" id="weeklyEarnings">$2,000</div>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h3>Annual Potential (4/week)</h3>
+                        <div class="value" id="annualPotential">$104,000</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="saved-orders">
+                <h3>Saved Orders</h3>
+                <div id="ordersList"></div>
+                <button class="btn" onclick="exportOrders()" style="margin-top:20px">Export Orders to CSV</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let orders = [];
+const DEALER_PASSWORD = "ADT2025";
+const packageRates = { basic: 28.99, smart: 52.99, complete: 62.99 };
+
+function showLogin() {
+    document.getElementById('login-modal').classList.add('active');
+}
+
+function closeLogin() {
+    document.getElementById('login-modal').classList.remove('active');
+    document.getElementById('login-password').value = '';
+}
+
+function login() {
+    if (document.getElementById('login-password').value === DEALER_PASSWORD) {
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('main-header').style.display = 'none';
+        document.getElementById('dashboard').classList.add('active');
+        closeLogin();
+    } else {
+        alert('Incorrect password');
+    }
+}
+
+function logout() {
+    document.getElementById('main-content').style.display = 'block';
+    document.getElementById('main-header').style.display = 'block';
+    document.getElementById('dashboard').classList.remove('active');
+}
+
+function calculateAndSave() {
+    const customerName = document.getElementById('customerName').value;
+    const customerAddress = document.getElementById('customerAddress').value;
+    const customerPhone = document.getElementById('customerPhone').value;
+    const packageType = document.getElementById('packageType').value;
+    const customRate = document.getElementById('customRate').value;
+    const commissionRate = parseFloat(document.getElementById('commissionRate').value);
+    const salesCount = parseInt(document.getElementById('salesCount').value);
+    
+    const monthlyRate = customRate ? parseFloat(customRate) : packageRates[packageType];
+    const totalCommission = commissionRate * salesCount;
+    const weeklyEarnings = commissionRate * 4;
+    const annualPotential = weeklyEarnings * 52;
+    
+    document.getElementById('commissionPerSale').textContent = '$' + commissionRate.toFixed(2);
+    document.getElementById('totalCommission').textContent = '$' + totalCommission.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('monthlyRecurring').textContent = '$' + monthlyRate.toFixed(2);
+    document.getElementById('weeklyEarnings').textContent = '$' + weeklyEarnings.toLocaleString('en-US', {minimumFractionDigits: 2});
+    document.getElementById('annualPotential').textContent = '$' + annualPotential.toLocaleString('en-US', {minimumFractionDigits: 2});
+    
+    if (customerName && customerAddress && customerPhone) {
+        orders.push({
+            id: Date.now(),
+            date: new Date().toLocaleDateString(),
+            customerName,
+            customerAddress,
+            customerPhone,
+            packageType: packageType.charAt(0).toUpperCase() + packageType.slice(1),
+            monthlyRate: monthlyRate.toFixed(2),
+            commission: commissionRate.toFixed(2)
+        });
+        
+        updateOrdersList();
+        document.getElementById('customerName').value = '';
+        document.getElementById('customerAddress').value = '';
+        document.getElementById('customerPhone').value = '';
+        alert('Order saved successfully!');
+    }
+}
+
+function updateOrdersList() {
+    const list = document.getElementById('ordersList');
+    if (orders.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:#999; padding:20px">No orders saved yet</p>';
+        return;
+    }
+    
+    list.innerHTML = orders.map(o => `
+        <div class="order-item">
+            <h4>${o.customerName}</h4>
+            <p><strong>Address:</strong> ${o.customerAddress}</p>
+            <p><strong>Phone:</strong> ${o.customerPhone}</p>
+            <p><strong>Package:</strong> ${o.packageType} - $${o.monthlyRate}/mo</p>
+            <p><strong>Commission:</strong> $${o.commission}</p>
+            <p style="color:#6c757d"><strong>Date:</strong> ${o.date}</p>
+            <button class="btn btn-delete" onclick="deleteOrder(${o.id})">Delete</button>
+        </div>
+    `).join('');
+}
+
+function deleteOrder(id) {
+    if (confirm('Delete this order?')) {
+        orders = orders.filter(o => o.id !== id);
+        updateOrdersList();
+    }
+}
+
+function exportOrders() {
+    if (orders.length === 0) return alert('No orders to export');
+    
+    const csv = [
+        ['Date', 'Customer Name', 'Address', 'Phone', 'Package', 'Monthly Rate', 'Commission'].join(','),
+        ...orders.map(o => [o.date, `"${o.customerName}"`, `"${o.customerAddress}"`, o.customerPhone, o.packageType, o.monthlyRate, o.commission].join(','))
+    ].join('\n');
+    
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'adt_orders_' + new Date().toISOString().split('T')[0] + '.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+document.getElementById('commissionRate').addEventListener('input', calculateAndSave);
+document.getElementById('salesCount').addEventListener('input', calculateAndSave);
+document.getElementById('packageType').addEventListener('change', calculateAndSave);
+document.getElementById('customRate').addEventListener('input', calculateAndSave);
+document.getElementById('login-password').addEventListener('keypress', e => { if (e.key === 'Enter') login(); });
+
+updateOrdersList();
+</script>
+
+</body>
+</html>
