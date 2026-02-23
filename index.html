@@ -1,644 +1,1087 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Direct Protection Security | ADT Authorized Dealer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; color: #1a1a2e; background: #f8f9fa; line-height: 1.6; }
-        
-        header { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; padding: 20px 40px; position: fixed; width: 100%; top: 0; z-index: 1000; box-shadow: 0 4px 20px rgba(0, 61, 130, 0.3); }
-        .header-container { display: flex; align-items: center; justify-content: space-between; max-width: 1400px; margin: 0 auto; }
-        .logo-text { font-size: 1.4em; font-weight: 700; color: white; }
-        .hamburger { display: none; cursor: pointer; font-size: 28px; color: white; }
-        nav ul { list-style: none; display: flex; gap: 25px; }
-        nav a { color: white; text-decoration: none; font-weight: 600; transition: all 0.3s; padding: 8px 16px; border-radius: 6px; }
-        nav a:hover { background: rgba(255, 255, 255, 0.2); }
-        
-        .hero { background: linear-gradient(135deg, #003d82 0%, #0057b8 50%, #0069d9 100%); color: white; text-align: center; padding: 180px 40px 100px; }
-        .hero h1 { font-size: 3.2em; margin-bottom: 25px; }
-        .hero p { font-size: 1.3em; margin: 20px auto; max-width: 700px; }
-        
-        .btn { background: linear-gradient(135deg, #0069d9 0%, #0057b8 100%); color: white; padding: 16px 40px; border-radius: 8px; text-decoration: none; font-weight: 700; display: inline-block; margin: 10px; box-shadow: 0 6px 20px rgba(0, 89, 184, 0.3); transition: all 0.3s; border: none; cursor: pointer; font-size: 1em; }
-        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0, 89, 184, 0.4); }
-        .btn-secondary { background: white; color: #0057b8; }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.9); }
-        
-        section { padding: 100px 40px; max-width: 1400px; margin: 0 auto; }
-        h2 { color: #003d82; font-size: 2.5em; margin-bottom: 40px; text-align: center; position: relative; padding-bottom: 20px; }
-        h2::after { content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 80px; height: 4px; background: linear-gradient(90deg, #003d82, #0069d9); border-radius: 2px; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; margin-top: 60px; }
-        .card { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 30px rgba(0, 61, 130, 0.08); transition: all 0.3s; border: 2px solid transparent; }
-        .card:hover { transform: translateY(-8px); box-shadow: 0 16px 50px rgba(0, 61, 130, 0.15); border-color: #0069d9; }
-        .card h3 { color: #003d82; font-size: 1.8em; margin-bottom: 15px; }
-        .price { font-size: 2.5em; color: #0057b8; font-weight: 700; margin: 20px 0; }
-        
-        .features { list-style: none; padding: 0; margin: 25px 0; }
-        .features li { margin: 15px 0; padding-left: 30px; position: relative; font-size: 1.05em; color: #333; }
-        .features li:before { content: '✓'; color: #0069d9; position: absolute; left: 0; font-weight: bold; font-size: 1.3em; }
-        
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 61, 130, 0.9); justify-content: center; align-items: center; z-index: 2000; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; padding: 50px; border-radius: 20px; max-width: 500px; width: 90%; box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3); text-align: center; }
-        
-        #dashboard { display: none; min-height: 100vh; background: #f1f3f5; padding-top: 80px; }
-        #dashboard.active { display: block; }
-        .dashboard-header { background: white; padding: 30px 40px; box-shadow: 0 2px 10px rgba(0, 61, 130, 0.1); margin-bottom: 30px; }
-        .dashboard-content { max-width: 1600px; margin: 0 auto; padding: 0 40px 60px; }
-        
-        .calculator-section { background: white; border-radius: 16px; padding: 40px; box-shadow: 0 8px 30px rgba(0, 61, 130, 0.08); margin-bottom: 40px; }
-        .calc-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 40px; margin-top: 30px; }
-        
-        .input-group { margin-bottom: 20px; }
-        .input-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #003d82; font-size: 0.95em; }
-        .input-group input, .input-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1em; transition: all 0.3s; }
-        .input-group input:focus, .input-group select:focus { outline: none; border-color: #0069d9; box-shadow: 0 0 0 3px rgba(0, 105, 217, 0.1); }
-        
-        .equipment-section { background: #f8f9fa; padding: 25px; border-radius: 12px; margin: 25px 0; max-height: 600px; overflow-y: auto; }
-        .equipment-header { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 15px; padding: 12px; font-weight: 700; color: #003d82; border-bottom: 2px solid #dee2e6; margin-bottom: 15px; font-size: 0.9em; }
-        .equipment-item { display: grid; grid-template-columns: 3fr 1fr 1fr 1fr; gap: 15px; align-items: center; margin-bottom: 10px; padding: 12px; background: white; border-radius: 8px; border: 1px solid #e9ecef; transition: all 0.2s; }
-        .equipment-item:hover { border-color: #0069d9; box-shadow: 0 2px 8px rgba(0, 105, 217, 0.1); }
-        .equipment-item.has-qty { background: #e7f3ff; border-color: #0069d9; }
-        .equipment-item label { font-weight: 600; color: #333; font-size: 0.9em; }
-        .equipment-item .cost { color: #666; font-size: 0.85em; margin-top: 3px; }
-        .equipment-item input { padding: 8px; text-align: center; font-weight: 600; border: 2px solid #e0e0e0; border-radius: 6px; }
-        .equipment-item input:focus { outline: none; border-color: #0069d9; }
-        .equipment-item .subtotal { font-weight: 700; color: #0057b8; text-align: right; font-size: 0.95em; }
-        
-        .results-panel { background: linear-gradient(135deg, #003d82 0%, #0069d9 100%); color: white; padding: 30px; border-radius: 16px; position: sticky; top: 100px; }
-        .result-item { margin: 15px 0; padding: 20px; background: rgba(255, 255, 255, 0.15); border-radius: 12px; }
-        .result-item h3 { font-size: 0.95em; margin-bottom: 8px; font-weight: 600; opacity: 0.9; }
-        .result-item .value { font-size: 2em; font-weight: 700; }
-        .result-item.small .value { font-size: 1.5em; }
-        .result-item.package-detected { background: rgba(40, 167, 69, 0.3); border: 2px solid rgba(40, 167, 69, 0.6); }
-        
-        .deductions-breakdown { background: rgba(255, 255, 255, 0.1); padding: 20px; border-radius: 12px; margin-top: 20px; }
-        .deduction-line { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.95em; }
-        .deduction-line:last-child { border-bottom: none; font-weight: 700; font-size: 1.1em; margin-top: 10px; padding-top: 15px; border-top: 2px solid rgba(255, 255, 255, 0.3); }
-        .deduction-line.labor-detail { padding-left: 20px; font-size: 0.85em; opacity: 0.9; }
-        
-        .saved-orders { margin-top: 40px; background: #f8f9fa; padding: 40px; border-radius: 16px; border: 2px solid #e9ecef; }
-        .order-item { background: white; padding: 25px; margin: 15px 0; border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 61, 130, 0.06); border-left: 4px solid #0069d9; }
-        
-        .logout-btn { background: #6c757d; padding: 10px 30px; border-radius: 8px; color: white; border: none; cursor: pointer; font-weight: 600; }
-        
-        footer { background: linear-gradient(135deg, #003d82 0%, #0057b8 100%); color: white; text-align: center; padding: 60px 40px; }
-        
-        @media(max-width: 1024px) {
-            .calc-grid { grid-template-columns: 1fr; }
-            .results-panel { position: static; }
-            .equipment-item, .equipment-header { grid-template-columns: 2fr 70px 90px 70px; gap: 8px; font-size: 0.85em; }
-            .equipment-item label { font-size: 0.8em; }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Direct Protection Security | ADT Authorized Dealer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --blue:#0057b8;--blue-lt:#1a7fe8;--blue-dp:#003d82;
+  --cyan:#06b6d4;--cyan-lt:#22d3ee;
+  --green:#22c55e;--red:#ef4444;--amber:#fbbf24;
+  --bg:#04070f;
+  --card:rgba(255,255,255,0.05);--card-hv:rgba(255,255,255,0.085);
+  --border:rgba(255,255,255,0.10);--border-c:rgba(6,182,212,0.30);
+  --txt:#f1f5f9;--muted:#64748b;--dim:#94a3b8;
+  --grad:linear-gradient(135deg,#0057b8,#06b6d4);
+  --gtxt:linear-gradient(135deg,#fff 0%,#22d3ee 100%);
+  --glow:0 0 40px rgba(6,182,212,0.14);
+  --shadow:0 24px 64px rgba(0,0,0,0.38);
+}
+html{scroll-behavior:smooth;scroll-padding-top:74px}
+body{font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;background:var(--bg);color:var(--txt);-webkit-font-smoothing:antialiased;line-height:1.65;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(255,255,255,0.016) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.016) 1px,transparent 1px);background-size:54px 54px}
+body>*{position:relative;z-index:1}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--blue);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--cyan)}
+#scrollBar{position:fixed;top:0;left:0;height:3px;width:0%;background:var(--grad);z-index:9999;transition:width .08s linear}
+.container{max-width:1340px;margin:0 auto;padding:0 28px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:28px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:28px}
+.gt{background:var(--gtxt);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-14px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)}}
+@keyframes orbDrift{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(20px,-26px) scale(1.05)}66%{transform:translate(-14px,16px) scale(0.96)}}
+@keyframes pulseRing{0%{width:0;height:0;opacity:.65}100%{width:900px;height:900px;opacity:0}}
+@keyframes spinGlow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.fade{opacity:0;transform:translateY(26px);transition:opacity .6s ease,transform .6s ease}
+.fade.in{opacity:1;transform:translateY(0)}
+header{position:fixed;top:0;width:100%;z-index:500;background:rgba(4,7,15,.9);backdrop-filter:blur(28px) saturate(180%);border-bottom:1px solid var(--border)}
+.hd-inner{display:flex;justify-content:space-between;align-items:center;padding:14px 28px;max-width:1340px;margin:0 auto}
+.logo{display:flex;align-items:center;gap:13px;text-decoration:none}
+.logo-name{font-family:"Syne",sans-serif;font-size:17px;font-weight:800;background:var(--gtxt);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;white-space:nowrap}
+.logo-tag{font-size:11px;color:var(--muted);font-weight:400}
+nav{display:flex;align-items:center;gap:32px}
+nav a{color:var(--dim);text-decoration:none;font-size:14px;font-weight:500;position:relative;transition:color .2s}
+nav a::after{content:"";position:absolute;bottom:-4px;left:0;width:0;height:2px;background:var(--cyan);border-radius:2px;transition:width .22s}
+nav a:hover{color:#fff}
+nav a:hover::after{width:100%}
+.mob-btn{display:none;background:none;border:none;color:#fff;font-size:22px;cursor:pointer;padding:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 24px;border-radius:10px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;font-weight:700;font-size:14px;text-decoration:none;border:none;cursor:pointer;transition:transform .2s,box-shadow .2s,background .2s,opacity .2s;white-space:nowrap}
+.btn-p{background:var(--grad);color:#fff;box-shadow:0 4px 22px rgba(0,87,184,.35)}
+.btn-p:hover{transform:translateY(-2px);box-shadow:0 8px 34px rgba(0,87,184,.55)}
+.btn-p:disabled{opacity:.6;transform:none;cursor:not-allowed}
+.btn-o{background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.18) !important}
+.btn-o:hover{background:rgba(255,255,255,.11)}
+.btn-lg{padding:15px 34px;font-size:16px;border-radius:12px}
+.btn-w{width:100%}
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:120px 28px 80px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse 90% 65% at 12% 38%,rgba(0,61,130,.38) 0%,transparent 58%),radial-gradient(ellipse 65% 50% at 88% 72%,rgba(6,182,212,.18) 0%,transparent 52%),radial-gradient(ellipse 50% 40% at 55% 15%,rgba(0,87,184,.12) 0%,transparent 55%),linear-gradient(180deg,#0a0f22 0%,#04070f 100%)}
+.orb{position:absolute;border-radius:50%;filter:blur(88px);pointer-events:none;z-index:1}
+.orb1{width:600px;height:600px;background:rgba(0,87,184,.28);top:-160px;left:-160px;animation:orbDrift 12s ease-in-out infinite}
+.orb2{width:420px;height:420px;background:rgba(6,182,212,.22);bottom:-100px;right:-80px;animation:orbDrift 10s ease-in-out infinite reverse;animation-delay:-4s}
+.orb3{width:300px;height:300px;background:rgba(0,61,130,.2);top:40%;left:55%;animation:orbDrift 14s ease-in-out infinite;animation-delay:-7s}
+.pulse{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;pointer-events:none}
+.pulse span{display:block;position:absolute;border:1px solid rgba(6,182,212,.1);border-radius:50%;transform:translate(-50%,-50%);animation:pulseRing 6s ease-out infinite}
+.pulse span:nth-child(2){animation-delay:2s}
+.pulse span:nth-child(3){animation-delay:4s}
+.hero-content{text-align:center;position:relative;z-index:10;max-width:880px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;padding:8px 18px;border-radius:50px;background:rgba(6,182,212,.10);border:1px solid var(--border-c);font-size:13px;font-weight:600;color:var(--cyan-lt);margin-bottom:30px;animation:fadeDown .7s ease both}
+.hero h1{font-family:"Syne",sans-serif;font-size:clamp(46px,7vw,80px);font-weight:800;line-height:1.06;letter-spacing:-2px;margin-bottom:22px;animation:fadeUp .7s .12s ease both}
+.hero-sub{font-size:clamp(16px,2.2vw,20px);color:var(--dim);margin-bottom:40px;max-width:620px;margin-left:auto;margin-right:auto;animation:fadeUp .7s .22s ease both}
+.hero-cta{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:50px;animation:fadeUp .7s .32s ease both}
+.offer-card{display:inline-block;padding:22px 34px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid var(--border);backdrop-filter:blur(12px);animation:fadeUp .7s .42s ease both;position:relative;overflow:hidden}
+.offer-card::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(0,87,184,.14),rgba(6,182,212,.08))}
+.offer-pill{display:inline-block;padding:4px 12px;border-radius:50px;background:rgba(6,182,212,.18);border:1px solid var(--border-c);font-size:11px;font-weight:700;color:var(--cyan);letter-spacing:.07em;text-transform:uppercase;margin-bottom:10px}
+.offer-text{font-size:clamp(16px,2.4vw,23px);font-weight:700;line-height:1.4}
+.stats-band{padding:52px 28px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:rgba(255,255,255,.018);position:relative;overflow:hidden}
+.stats-band::before{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 100% at 50% 50%,rgba(0,87,184,.07) 0%,transparent 70%)}
+.stat{text-align:center;padding:8px;position:relative;z-index:1}
+.stat-n{font-family:"Syne",sans-serif;font-size:clamp(34px,4vw,52px);font-weight:800;background:var(--gtxt);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.1;margin-bottom:6px}
+.stat-l{font-size:14px;color:var(--muted);font-weight:500}
+section{padding:90px 28px}
+.sec-hd{text-align:center;margin-bottom:60px}
+.sec-title{font-family:"Syne",sans-serif;font-size:clamp(30px,4.5vw,48px);font-weight:800;letter-spacing:-1px;margin-bottom:14px;line-height:1.1}
+.sec-sub{font-size:17px;color:var(--muted);max-width:540px;margin:0 auto}
+.sec-badge{display:inline-flex;align-items:center;gap:8px;padding:6px 16px;border-radius:50px;background:rgba(255,255,255,.045);border:1px solid var(--border);font-size:13px;color:var(--muted);margin-bottom:18px}
+.sec-alt{background:radial-gradient(ellipse 80% 60% at 80% 50%,rgba(0,87,184,.06) 0%,transparent 60%),rgba(255,255,255,.012)}
+.card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:40px;transition:transform .25s,box-shadow .25s,border-color .25s,background .25s;position:relative;overflow:hidden}
+.card::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.14),transparent);opacity:0;transition:opacity .25s}
+.card:hover{transform:translateY(-8px);box-shadow:var(--shadow),var(--glow);border-color:var(--border-c);background:var(--card-hv)}
+.card:hover::before{opacity:1}
+.card-pop{border:1.5px solid rgba(6,182,212,.4);background:linear-gradient(155deg,rgba(0,87,184,.12),rgba(6,182,212,.06));box-shadow:0 0 0 1px rgba(6,182,212,.1),var(--glow)}
+.card-pop::after{content:"";position:absolute;inset:-2px;border-radius:26px;z-index:-1;background:conic-gradient(from 0deg,transparent 60%,rgba(6,182,212,.4) 80%,transparent 90%);animation:spinGlow 6s linear infinite;opacity:.45}
+.pop-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--grad);padding:7px 22px;border-radius:0 0 12px 12px;font-size:10px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.c-tag{font-size:11px;font-weight:700;color:var(--cyan);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px}
+.c-name{font-family:"Syne",sans-serif;font-size:25px;font-weight:800;margin-bottom:8px;letter-spacing:-.5px}
+.c-desc{font-size:13px;color:var(--muted)}
+.price-wrap{padding:18px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border);margin:18px 0}
+.price-amt{font-family:"Syne",sans-serif;font-size:42px;font-weight:800;letter-spacing:-1px}
+.price-per{font-size:14px;color:var(--muted);font-weight:400}
+.feat-list{list-style:none;margin:18px 0 26px}
+.feat-list li{display:flex;align-items:flex-start;gap:10px;padding:7px 0;font-size:14px;color:var(--dim);border-bottom:1px solid rgba(255,255,255,.045)}
+.feat-list li:last-child{border-bottom:none}
+.feat-chk{color:var(--cyan);font-size:15px;flex-shrink:0;margin-top:2px}
+.tech-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:34px;transition:transform .25s,box-shadow .25s,border-color .25s}
+.tech-card:hover{transform:translateY(-6px);box-shadow:var(--shadow),var(--glow);border-color:var(--border-c)}
+.tech-icon{width:54px;height:54px;display:flex;align-items:center;justify-content:center;border-radius:14px;font-size:24px;margin-bottom:18px;background:linear-gradient(135deg,rgba(0,87,184,.28),rgba(6,182,212,.18));border:1px solid rgba(6,182,212,.2)}
+.tech-title{font-family:"Syne",sans-serif;font-size:19px;font-weight:700;margin-bottom:10px}
+.tech-desc{font-size:14px;color:var(--muted);line-height:1.75}
+.info-panel{padding:48px;border-radius:22px;border:1px solid rgba(255,255,255,.07);position:relative;overflow:hidden}
+.info-panel::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(135deg,rgba(0,87,184,.07),rgba(6,182,212,.04))}
+.why-pt{display:flex;gap:14px;margin-bottom:18px;font-size:15px;color:var(--dim)}
+.why-pt:last-child{margin-bottom:0}
+.why-pt strong{color:#fff}
+.callout{padding:22px 28px;border-radius:14px;border-left:4px solid var(--cyan);background:rgba(6,182,212,.06);font-size:15px;line-height:1.75;color:var(--dim)}
+.callout strong{color:#fff}
+.perf-card{border-radius:18px;padding:36px;text-align:center}
+.perf-g{background:rgba(34,197,94,.07);border:1.5px solid rgba(34,197,94,.22)}
+.perf-r{background:rgba(239,68,68,.07);border:1.5px solid rgba(239,68,68,.22)}
+.perf-a{background:rgba(251,191,36,.07);border:1.5px solid rgba(251,191,36,.22)}
+.perf-n{font-family:"Syne",sans-serif;font-size:56px;font-weight:800;line-height:1;margin-bottom:10px}
+.perf-t{font-size:15px;font-weight:700;margin-bottom:10px}
+.perf-b{font-size:13px;color:var(--muted);line-height:1.65}
+.cert{text-align:center;padding:30px 26px;border-radius:18px;background:var(--card);border:1.5px solid var(--border);min-width:220px;transition:transform .22s,box-shadow .22s}
+.cert:hover{transform:translateY(-5px);box-shadow:var(--glow)}
+.cert-c{border-color:rgba(6,182,212,.35)}
+.cert-b{border-color:rgba(0,87,184,.45)}
+.cert-g{border-color:rgba(16,185,129,.35)}
+.cert-icon{font-size:40px;margin-bottom:14px;display:block}
+.cert-name{font-family:"Syne",sans-serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.cert-sub{font-size:12px;color:var(--muted)}
+.mc{padding:24px;border-radius:16px;background:var(--card);border:1px solid var(--border);transition:border-color .22s,background .22s,transform .22s}
+.mc:hover{border-color:var(--border-c);background:var(--card-hv);transform:translateY(-3px)}
+.mc-hd{display:flex;align-items:center;gap:13px;margin-bottom:10px}
+.mc-em{font-size:24px}
+.mc-city{font-size:15px;font-weight:700}
+.mc-role{font-size:12px;color:var(--cyan);font-weight:600;margin-top:2px}
+.mc-body{font-size:13px;color:var(--muted);line-height:1.6}
+.form-wrap{background:var(--card);border:1px solid var(--border);border-radius:26px;padding:58px 52px;max-width:860px;margin:0 auto;position:relative;overflow:hidden}
+.form-wrap::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+.form-wrap::after{content:"";position:absolute;bottom:-100px;right:-100px;width:300px;height:300px;border-radius:50%;background:rgba(0,87,184,.10);filter:blur(70px);pointer-events:none}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.f-grp{margin-bottom:20px;position:relative;z-index:1}
+.f-grp label{display:block;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--dim)}
+.f-ctrl{width:100%;padding:13px 17px;border:1.5px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(0,0,0,.22);color:#fff;font-size:15px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;transition:border-color .2s,box-shadow .2s}
+.f-ctrl:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,.12)}
+.f-ctrl::placeholder{color:#2d3748}
+.f-ctrl option{background:#0c1120}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.90);backdrop-filter:blur(14px);justify-content:center;align-items:center;z-index:2000}
+.modal.on{display:flex;animation:fadeIn .2s ease}
+.modal-box{background:#0c1226;border:1px solid rgba(6,182,212,.22);border-radius:22px;padding:48px;width:90%;max-width:400px;animation:slideUp .28s ease;position:relative;overflow:hidden}
+.modal-box::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad)}
+.modal-title{font-family:"Syne",sans-serif;font-size:22px;font-weight:800;margin-bottom:26px}
+.modal-label{display:block;margin-bottom:8px;font-size:13px;font-weight:600;color:var(--dim)}
+.modal-input{width:100%;padding:13px 17px;border:1.5px solid rgba(255,255,255,.10);border-radius:10px;background:rgba(0,0,0,.35);color:#fff;font-size:15px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;margin-bottom:11px;transition:border-color .2s,box-shadow .2s}
+.modal-input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,.12)}
+.modal-err{display:none;font-size:13px;color:#fca5a5;margin-bottom:14px}
+.modal-btns{display:flex;gap:12px;margin-top:4px}
+footer{padding:70px 28px 38px;border-top:1px solid var(--border);background:#020409;position:relative;overflow:hidden}
+footer::before{content:"";position:absolute;top:0;left:50%;transform:translateX(-50%);width:600px;height:1px;background:linear-gradient(90deg,transparent,rgba(6,182,212,.3),transparent)}
+.ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:40px;margin-bottom:52px}
+.ft-logo{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.ft-about{font-size:14px;color:var(--muted);line-height:1.75;max-width:250px}
+.ft-col-t{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#fff;margin-bottom:16px}
+.ft-links{list-style:none}
+.ft-links li{margin-bottom:9px}
+.ft-links a{font-size:14px;color:var(--muted);text-decoration:none;transition:color .2s}
+.ft-links a:hover{color:var(--cyan)}
+.ft-bot{border-top:1px solid var(--border);padding-top:26px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.ft-copy{font-size:12px;color:var(--muted)}
+#mainSite.hidden{display:none !important}
+#portal{display:none;min-height:100vh;background:var(--bg)}
+#portal.on{display:block}
+.p-hd{background:linear-gradient(135deg,#0c1a4e,#072c40);border-bottom:1px solid rgba(6,182,212,.18);padding:22px 28px;position:sticky;top:0;z-index:100}
+.p-hd-inner{max-width:1540px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px}
+.p-title{font-family:"Syne",sans-serif;font-size:24px;font-weight:800;margin-bottom:3px}
+.p-sub{font-size:13px;color:rgba(255,255,255,.65)}
+.p-wrap{max-width:1540px;margin:0 auto;padding:28px}
+.cust-card{background:rgba(6,182,212,.06);border:1.5px solid rgba(6,182,212,.22);border-radius:16px;padding:22px 24px;margin-bottom:22px;position:relative;overflow:hidden}
+.cust-card::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.cust-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.cust-grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.cg{margin-bottom:0}
+.cg label{display:block;margin-bottom:5px;font-size:11px;font-weight:700;color:var(--cyan-lt);text-transform:uppercase;letter-spacing:.05em}
+.cg input{width:100%;padding:9px 12px;border:1.5px solid rgba(6,182,212,.22);border-radius:8px;background:rgba(0,0,0,.28);color:#fff;font-size:13px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;transition:border-color .2s,box-shadow .2s}
+.cg input:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,.12)}
+.cg input::placeholder{color:#334155}
+.p-layout{display:grid;grid-template-columns:1fr 358px;gap:26px;align-items:start}
+.p-glass{background:rgba(255,255,255,.038);border:1px solid var(--border);border-radius:18px;padding:30px}
+.p-sec-t{font-family:"Syne",sans-serif;font-size:16px;font-weight:700;color:var(--cyan);margin-bottom:20px}
+.p-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:4px}
+.pfg{margin-bottom:16px}
+.pfg label{display:block;margin-bottom:6px;font-size:11px;font-weight:700;color:var(--dim);text-transform:uppercase;letter-spacing:.05em}
+.pfg input,.pfg select{width:100%;padding:10px 13px;border:1.5px solid rgba(255,255,255,.09);border-radius:8px;background:rgba(0,0,0,.28);color:#fff;font-size:13px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;transition:border-color .2s,box-shadow .2s}
+.pfg input:focus,.pfg select:focus{outline:none;border-color:var(--cyan);box-shadow:0 0 0 3px rgba(6,182,212,.10)}
+.pfg select option{background:#0f1525}
+.cbox{margin-top:12px;padding:14px;background:rgba(255,255,255,.04);border-radius:8px;display:none}
+.cbox.on{display:block}
+.eq-cat{font-size:13px;font-weight:700;color:var(--cyan);padding:9px 0;border-bottom:1px solid rgba(6,182,212,.18);margin:26px 0 12px}
+.eq-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(198px,1fr));gap:9px}
+.eq-card{border:1.5px solid rgba(255,255,255,.07);border-radius:10px;padding:12px;background:rgba(15,30,80,.12);transition:border-color .2s,background .2s}
+.eq-card:hover{border-color:rgba(6,182,212,.35)}
+.eq-card.sel{border-color:var(--cyan);background:rgba(6,182,212,.09)}
+.eq-name{font-size:12px;font-weight:600;min-height:32px;margin-bottom:4px;line-height:1.35}
+.eq-price{font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:2px}
+.eq-model{font-size:11px;color:var(--muted);margin-bottom:8px;display:block}
+.eq-qty{display:flex;align-items:center;gap:6px}
+.eq-qty button{width:26px;height:26px;border-radius:6px;border:1.5px solid var(--cyan);background:transparent;color:var(--cyan);font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;transition:background .18s,color .18s}
+.eq-qty button:hover{background:var(--cyan);color:#fff}
+.eq-qty input{width:42px;text-align:center;padding:5px;border:1.5px solid rgba(255,255,255,.09);border-radius:5px;background:rgba(0,0,0,.28);color:#fff;font-size:13px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif}
+.eq-qty input:focus{outline:none;border-color:var(--cyan)}
+.res-sticky{position:sticky;top:84px;max-height:calc(100vh - 112px);overflow-y:auto}
+.res-sticky::-webkit-scrollbar{width:4px}
+.bundle-chip{background:rgba(34,197,94,.09);border:1.5px solid rgba(34,197,94,.28);border-radius:14px;padding:16px 18px;margin-bottom:12px;text-align:center}
+.b-sup{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.55);margin-bottom:4px}
+.b-name{font-family:"Syne",sans-serif;font-size:19px;font-weight:700;color:var(--green);margin-bottom:4px}
+.b-sub{font-size:12px;color:rgba(255,255,255,.72);line-height:1.4}
+.res-panel{background:var(--grad);border-radius:14px;padding:20px;margin-bottom:12px}
+.r-item{background:rgba(255,255,255,.10);border-radius:8px;padding:12px;margin-bottom:8px;text-align:center}
+.r-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.72);margin-bottom:4px}
+.r-val{font-family:"Syne",sans-serif;font-size:21px;font-weight:800}
+.net-box{background:rgba(34,197,94,.22);border:2px solid rgba(34,197,94,.45);border-radius:10px;padding:16px;text-align:center;margin-top:6px}
+.net-box .r-val{font-size:32px;color:#4ade80}
+.exp-box{background:rgba(255,255,255,.08);border-radius:10px;padding:14px;margin-top:8px;font-size:13px}
+.exp-box h4{font-weight:700;margin-bottom:10px;font-size:13px}
+.e-row{display:flex;justify-content:space-between;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px}
+.e-tot{display:flex;justify-content:space-between;padding:9px 0 0;border-top:1.5px solid rgba(255,255,255,.22);margin-top:4px;font-weight:700;font-size:13px}
+#laborDetail{padding-left:10px;font-size:11px;margin-top:5px;opacity:.82}
+.ord-box{background:rgba(6,182,212,.065);border:1.5px solid rgba(6,182,212,.22);border-radius:14px;padding:16px;margin-top:12px}
+.ord-hd{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:700;color:var(--cyan);margin-bottom:12px}
+.ord-list{max-height:340px;overflow-y:auto;margin-bottom:12px}
+.ord-line{display:flex;justify-content:space-between;padding:8px;background:rgba(255,255,255,.04);border-radius:7px;margin-bottom:5px;font-size:12px}
+.o-name{font-weight:600;margin-bottom:2px}
+.o-sub{color:var(--muted);font-size:11px}
+.o-price{color:var(--cyan);font-weight:700;flex-shrink:0;padding-left:8px}
+.btn-clr{background:rgba(220,38,38,.75);color:#fff;width:100%;border:none !important;border-radius:8px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;font-size:13px}
+.btn-clr:hover{background:var(--red)}
+.btn-cpy{background:var(--cyan);color:#fff;width:100%;border:none !important;border-radius:8px;font-family:Calibri,"Calibri Light","Trebuchet MS",Arial,sans-serif;font-size:13px}
+.btn-cpy:hover{background:#0891b2}
+.btn-copied{background:var(--green) !important}
+@media(max-width:1280px){.p-layout{grid-template-columns:1fr}.res-sticky{position:static;max-height:none}}
+@media(max-width:1024px){.g3{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr}.ft-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}.ft-grid{grid-template-columns:1fr}.f-row{grid-template-columns:1fr}.p-row{grid-template-columns:1fr}.cust-grid{grid-template-columns:1fr 1fr}.cust-grid-2{grid-template-columns:1fr}nav{display:none}.mob-btn{display:block}nav.open{display:flex;flex-direction:column;position:absolute;top:72px;right:20px;background:rgba(7,12,28,.98);border:1px solid var(--border);border-radius:14px;padding:20px 24px;gap:18px;backdrop-filter:blur(20px);z-index:99}.form-wrap{padding:36px 22px}.info-panel{padding:28px 22px}.hero h1{letter-spacing:-1px}.ft-bot{flex-direction:column;text-align:center}}
+</style>
 </head>
 <body>
+<div id="scrollBar"></div>
 
-<header id="main-header">
-    <div class="header-container">
-        <div class="logo-text">Direct Protection Security</div>
-        <div class="hamburger" onclick="document.querySelector('nav ul').classList.toggle('active')">☰</div>
-        <nav>
-            <ul>
-                <li><a href="#home">Home</a></li>
-                <li><a href="#packages">Packages</a></li>
-                <li><a href="#" onclick="showLogin()">Dealer Login</a></li>
-            </ul>
-        </nav>
+<div id="loginModal" class="modal" onclick="if(event.target===this)closeModal()">
+  <div class="modal-box">
+    <div class="modal-title">&#128272; Dealer Portal</div>
+    <label class="modal-label" for="dealerPw">Password</label>
+    <input type="password" id="dealerPw" class="modal-input" placeholder="Enter dealer password" onkeydown="if(event.key==='Enter')doLogin()">
+    <div id="loginErr" class="modal-err">&#10060; Incorrect password &mdash; please try again.</div>
+    <div class="modal-btns">
+      <button onclick="doLogin()" class="btn btn-p" style="flex:1">Sign In</button>
+      <button onclick="closeModal()" class="btn btn-o" style="flex:1">Cancel</button>
     </div>
-</header>
+  </div>
+</div>
 
-<div id="main-content">
-    <section id="home" class="hero">
+<div id="mainSite">
+  <header>
+    <div class="hd-inner">
+      <a class="logo" href="#home">
+        <svg width="40" height="40" viewBox="0 0 100 100" fill="none">
+          <polygon points="30,8 70,8 92,30 92,70 70,92 30,92 8,70 8,30" fill="#0057b8" stroke="#06b6d4" stroke-width="2.5"/>
+          <text x="50" y="63" font-family="Arial,sans-serif" font-size="31" font-weight="900" fill="white" text-anchor="middle">ADT</text>
+        </svg>
+        <div><div class="logo-name">Direct Protection Security</div><div class="logo-tag">ADT Authorized Dealer</div></div>
+      </a>
+      <nav id="mainNav">
+        <a href="#home">Home</a>
+        <a href="#packages">Packages</a>
+        <a href="#technology">Technology</a>
+        <a href="#monitoring">Monitoring</a>
+        <a href="#contact">Contact</a>
+        <button onclick="openModal()" class="btn btn-p" style="padding:10px 20px;font-size:13px">Dealer Portal</button>
+      </nav>
+      <button class="mob-btn" onclick="toggleNav()" aria-label="Toggle menu">&#9776;</button>
+    </div>
+  </header>
+
+  <section id="home" class="hero">
+    <div class="orb orb1"></div><div class="orb orb2"></div><div class="orb orb3"></div>
+    <div class="pulse" aria-hidden="true"><span></span><span></span><span></span></div>
+    <div class="hero-content">
+      <div class="hero-badge">&#11088; Trusted ADT Authorized Dealer</div>
+      <h1>Protect What<br><span class="gt">Matters Most</span></h1>
+      <p class="hero-sub">Advanced home security backed by 150+ years of ADT expertise &mdash; with 24/7 professional monitoring and zero-compromise protection.</p>
+      <div class="hero-cta">
+        <a href="#contact" class="btn btn-p btn-lg">Get a Free Quote &rarr;</a>
+        <a href="#packages" class="btn btn-o btn-lg">View Packages</a>
+      </div>
+      <div class="offer-card">
+        <div class="offer-pill">&#127881; Limited-Time Offer</div>
+        <div class="offer-text">FREE Installation + First Month FREE<br>with Any Customized Package</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-band">
+    <div class="container">
+      <div class="g4">
+        <div class="stat fade"><div class="stat-n">152</div><div class="stat-l">Years of ADT Heritage</div></div>
+        <div class="stat fade"><div class="stat-n">6M+</div><div class="stat-l">Homes Protected</div></div>
+        <div class="stat fade"><div class="stat-n">24/7</div><div class="stat-l">Professional Monitoring</div></div>
+        <div class="stat fade"><div class="stat-n">99.9%</div><div class="stat-l">Network Uptime</div></div>
+      </div>
+    </div>
+  </div>
+
+  <section id="packages">
+    <div class="container">
+      <div class="sec-hd fade">
+        <div class="sec-badge">&#128230; Security Plans</div>
+        <h2 class="sec-title">Choose Your <span class="gt">Protection Level</span></h2>
+        <p class="sec-sub">Every package includes FREE professional installation and equipment &mdash; no hidden fees, no surprises.</p>
+      </div>
+      <div class="g3">
+        <div class="card fade">
+          <div class="c-tag">Essential</div>
+          <div class="c-name">Basic Protection</div>
+          <div class="c-desc">Core security for everyday peace of mind.</div>
+          <div class="price-wrap"><span class="price-amt">$42<span style="font-size:22px">.99</span></span><span class="price-per"> / mo</span></div>
+          <ul class="feat-list">
+            <li><span class="feat-chk">&#10003;</span>24/7 Professional Monitoring</li>
+            <li><span class="feat-chk">&#10003;</span>Door &amp; Window Sensors</li>
+            <li><span class="feat-chk">&#10003;</span>Motion Detectors</li>
+            <li><span class="feat-chk">&#10003;</span>Control Panel</li>
+            <li><span class="feat-chk">&#10003;</span>Yard Sign &amp; Window Decals</li>
+            <li><span class="feat-chk">&#10003;</span>FREE Installation ($850 value)</li>
+          </ul>
+          <a href="#contact" class="btn btn-o btn-w">Get Started</a>
+        </div>
+        <div class="card card-pop fade">
+          <div class="pop-badge">Most Popular</div>
+          <div class="c-tag">Recommended</div>
+          <div class="c-name">Pulse Smart Home</div>
+          <div class="c-desc">Complete smart home security integration.</div>
+          <div class="price-wrap"><span class="price-amt">$52<span style="font-size:22px">.99</span></span><span class="price-per"> / mo</span></div>
+          <ul class="feat-list">
+            <li><span class="feat-chk">&#10003;</span>Everything in Basic Protection</li>
+            <li><span class="feat-chk">&#10003;</span>ADT Mobile App Control</li>
+            <li><span class="feat-chk">&#10003;</span>Smart Home Automation</li>
+            <li><span class="feat-chk">&#10003;</span>Video Doorbell Camera</li>
+            <li><span class="feat-chk">&#10003;</span>Indoor HD Camera</li>
+            <li><span class="feat-chk">&#10003;</span>Smart Lock Integration</li>
+            <li><span class="feat-chk">&#10003;</span>Remote Arm / Disarm</li>
+            <li><span class="feat-chk">&#10003;</span>FREE Installation ($1,200 value)</li>
+          </ul>
+          <a href="#contact" class="btn btn-p btn-w" style="border:none">Get Started</a>
+        </div>
+        <div class="card fade">
+          <div class="c-tag">Ultimate</div>
+          <div class="c-name">Total Intelligence</div>
+          <div class="c-desc">Maximum protection powered by AI analytics.</div>
+          <div class="price-wrap"><span class="price-amt">$64<span style="font-size:22px">.99</span></span><span class="price-per"> / mo</span></div>
+          <ul class="feat-list">
+            <li><span class="feat-chk">&#10003;</span>Everything in Pulse Smart Home</li>
+            <li><span class="feat-chk">&#10003;</span>Google Smart Home Integration</li>
+            <li><span class="feat-chk">&#10003;</span>AI-Powered Threat Analytics</li>
+            <li><span class="feat-chk">&#10003;</span>4K Outdoor Cameras (&times;2)</li>
+            <li><span class="feat-chk">&#10003;</span>30-Day Cloud Video Storage</li>
+            <li><span class="feat-chk">&#10003;</span>Smart Thermostat Included</li>
+            <li><span class="feat-chk">&#10003;</span>Smart Fire &amp; CO Alarm</li>
+            <li><span class="feat-chk">&#10003;</span>Priority Premium Support</li>
+            <li><span class="feat-chk">&#10003;</span>FREE Installation ($1,500 value)</li>
+          </ul>
+          <a href="#contact" class="btn btn-o btn-w">Get Started</a>
+        </div>
+      </div>
+      <div style="margin-top:28px;padding:20px 28px;background:rgba(255,255,255,.028);border:1px solid var(--border);border-radius:14px;text-align:center">
+        <p style="font-size:14px;color:var(--muted)">&#128179; <strong style="color:#fff">Flexible Financing Available</strong> &nbsp;|&nbsp; No Credit Check Required &nbsp;|&nbsp; $0 Down Payment Options</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="technology" class="sec-alt">
+    <div class="container">
+      <div class="sec-hd fade">
+        <div class="sec-badge">&#9881; Technology</div>
+        <h2 class="sec-title">Advanced <span class="gt">Security Technology</span></h2>
+        <p class="sec-sub">Industry-leading systems engineered to keep your home safe every hour of every day.</p>
+      </div>
+      <div class="g3" style="margin-bottom:48px">
+        <div class="tech-card fade"><div class="tech-icon">&#128241;</div><div class="tech-title">Smart App Control</div><p class="tech-desc">Monitor and control your entire security system from anywhere with real-time alerts, live video, and instant emergency response.</p></div>
+        <div class="tech-card fade"><div class="tech-icon">&#127909;</div><div class="tech-title">HD Video Monitoring</div><p class="tech-desc">Crystal-clear 4K cameras with night vision, motion detection, and AI analytics to identify people, vehicles, and potential threats.</p></div>
+        <div class="tech-card fade"><div class="tech-icon">&#128276;</div><div class="tech-title">24/7 Professional Monitoring</div><p class="tech-desc">Round-the-clock protection 365 days a year with an industry-leading average response time of just 45 seconds from alert to dispatch.</p></div>
+        <div class="tech-card fade"><div class="tech-icon">&#9889;</div><div class="tech-title">Cellular Backup</div><p class="tech-desc">Your system stays connected even when power or internet goes down. Dual-path communication ensures no single point of failure.</p></div>
+        <div class="tech-card fade"><div class="tech-icon">&#128274;</div><div class="tech-title">Smart Locks</div><p class="tech-desc">Remotely lock and unlock doors, create temporary access codes, and receive alerts whenever someone enters or exits your home.</p></div>
+        <div class="tech-card fade"><div class="tech-icon">&#127777;</div><div class="tech-title">Environmental Sensors</div><p class="tech-desc">Smoke, carbon monoxide, flood, and temperature sensors work together to protect against environmental threats before they become disasters.</p></div>
+      </div>
+      <div class="info-panel fade">
+        <div class="g2" style="align-items:center;gap:48px">
+          <div>
+            <h3 style="font-family:'Syne',sans-serif;font-size:30px;font-weight:800;margin-bottom:14px">Why ADT Stands Out</h3>
+            <p style="font-size:17px;color:var(--dim);margin-bottom:26px">The critical difference between DIY and professional security.</p>
+            <div class="why-pt"><span style="color:var(--cyan);font-size:18px;flex-shrink:0">&#10003;</span><div><strong>Zero False Alarms:</strong> Professional installation eliminates 95% of false triggers.</div></div>
+            <div class="why-pt"><span style="color:var(--cyan);font-size:18px;flex-shrink:0">&#10003;</span><div><strong>Faster Response:</strong> Direct connection to police, fire, and medical dispatch.</div></div>
+            <div class="why-pt"><span style="color:var(--cyan);font-size:18px;flex-shrink:0">&#10003;</span><div><strong>Lower Insurance:</strong> ADT customers save up to 20% on homeowners insurance premiums.</div></div>
+            <div class="why-pt"><span style="color:var(--cyan);font-size:18px;flex-shrink:0">&#10003;</span><div><strong>Proven Deterrent:</strong> Homes with ADT are 300% less likely to be targeted by burglars.</div></div>
+          </div>
+          <div>
+            <p style="font-size:15px;line-height:1.85;color:var(--dim)"><strong style="color:#fff">&#128161; Why Professional Installation Matters:</strong> Our certified technicians ensure every sensor, camera, and device is precisely calibrated. Combined with 24/7 professional monitoring, when your alarm triggers, responders know it is a real emergency.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="background:radial-gradient(ellipse 80% 60% at 20% 50%,rgba(0,61,130,.10) 0%,transparent 65%),rgba(255,255,255,.01)">
+    <div class="container">
+      <div class="sec-hd fade">
+        <div class="sec-badge">&#128202; Trusted Nationwide</div>
+        <h2 class="sec-title"><span class="gt">Industry-Leading Performance</span></h2>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:22px;padding:44px" class="fade">
+        <div class="g4" style="margin-bottom:44px">
+          <div style="text-align:center;padding:20px"><div style="font-family:'Syne',sans-serif;font-size:46px;font-weight:800;color:var(--cyan);margin-bottom:8px">6.5M+</div><div style="color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em">Homes Protected</div></div>
+          <div style="text-align:center;padding:20px"><div style="font-family:'Syne',sans-serif;font-size:46px;font-weight:800;color:var(--cyan);margin-bottom:8px">520K+</div><div style="color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em">Businesses Secured</div></div>
+          <div style="text-align:center;padding:20px"><div style="font-family:'Syne',sans-serif;font-size:46px;font-weight:800;color:var(--cyan);margin-bottom:8px">850K+</div><div style="color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em">Customer Reviews</div></div>
+          <div style="text-align:center;padding:20px"><div style="font-size:28px;margin-bottom:8px">&#11088;&#11088;&#11088;&#11088;</div><div style="font-family:'Syne',sans-serif;font-size:24px;font-weight:800;color:var(--cyan)">4.2 / 5</div><div style="color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:.06em">Avg. Rating</div></div>
+        </div>
+        <div style="border-top:1px solid rgba(6,182,212,.25);padding-top:32px">
+          <h3 style="text-align:center;font-family:'Syne',sans-serif;font-size:26px;font-weight:800;margin-bottom:28px;color:var(--cyan)">&#128737; Professional Installation Makes the Difference</h3>
+          <div class="g3" style="gap:22px">
+            <div class="perf-card perf-g"><div class="perf-n" style="color:#22c55e">96%</div><div class="perf-t">False Alarm Prevention</div><p class="perf-b">Professional installation prevents false alarms &mdash; ensuring dispatch responds only to real emergencies.</p></div>
+            <div class="perf-card perf-r"><div class="perf-n" style="color:#ef4444">94%</div><div class="perf-t">DIY System False Alarm Rate</div><p class="perf-b">Self-installed systems trigger false alarms due to improper sensor placement and user error.</p></div>
+            <div class="perf-card perf-a"><div class="perf-n" style="color:#fbbf24">2.8M</div><div class="perf-t">Hours Lost Annually</div><p class="perf-b">Emergency services spend millions of hours responding to preventable false alarms each year.</p></div>
+          </div>
+          <div class="callout" style="margin-top:28px"><strong>&#128161; The Professional Advantage:</strong> Our certified technicians ensure every device is precisely calibrated. This precision means when your alarm triggers, it is a real emergency and we are ready immediately.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="monitoring" class="sec-alt">
+    <div class="container">
+      <div class="sec-hd fade">
+        <h2 class="sec-title"><span class="gt">12 Monitoring Centers</span> Watching Over You</h2>
+        <p class="sec-sub">The most advanced security monitoring network in North America.</p>
+      </div>
+      <div style="display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:60px" class="fade">
+        <div class="cert cert-c"><span class="cert-icon">&#128142;</span><div class="cert-name" style="color:var(--cyan)">TMA Five Diamond</div><div class="cert-sub">Certified Excellence</div></div>
+        <div class="cert cert-b"><span class="cert-icon">&#128737;</span><div class="cert-name" style="color:var(--blue-lt)">UL Certified</div><div class="cert-sub">Underwriters Laboratories</div></div>
+        <div class="cert cert-g"><span class="cert-icon">&#128101;</span><div class="cert-name" style="color:#10b981">1,000+ Operators</div><div class="cert-sub">24/7/365 Coverage</div></div>
+      </div>
+      <div class="g3" style="margin-bottom:52px">
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127964;</span><div><div class="mc-city">Mesa, Arizona</div><div class="mc-role">Advanced Security Operations</div></div></div><p class="mc-body">Primary hub for AI analytics, video verification, and smart home integration monitoring.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127760;</span><div><div class="mc-city">Newark, Delaware</div><div class="mc-role">Network Operations Center</div></div></div><p class="mc-body">Manages nationwide network infrastructure, cybersecurity, and system connectivity.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#128260;</span><div><div class="mc-city">Wichita, Kansas</div><div class="mc-role">Backup &amp; Disaster Recovery</div></div></div><p class="mc-body">Central U.S. location provides redundancy and failover if other centers experience outages.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127970;</span><div><div class="mc-city">Irving, Texas</div><div class="mc-role">Commercial &amp; Residential</div></div></div><p class="mc-body">Handles large-scale commercial accounts and high-volume residential monitoring for the Southwest.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127956;</span><div><div class="mc-city">Knoxville, Tennessee</div><div class="mc-role">Southeast Regional Hub</div></div></div><p class="mc-body">Primary monitoring for the Southeastern U.S., specializing in severe weather emergency protocols.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#9968;</span><div><div class="mc-city">Aurora, Colorado</div><div class="mc-role">Mountain Region Operations</div></div></div><p class="mc-body">Services Rocky Mountain and Western states with specialized high-altitude monitoring.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127967;</span><div><div class="mc-city">Ogden, Utah</div><div class="mc-role">Pacific West Coverage</div></div></div><p class="mc-body">Handles West Coast accounts with Pacific time zone optimization and earthquake response protocols.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127925;</span><div><div class="mc-city">Brentwood, Tennessee</div><div class="mc-role">Premium Services Division</div></div></div><p class="mc-body">Dedicated to high-value residential estates and VIP client monitoring with enhanced protocols.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#129413;</span><div><div class="mc-city">Owings Mills, Maryland</div><div class="mc-role">Mid-Atlantic Operations</div></div></div><p class="mc-body">Serves the densely populated Northeast corridor with rapid municipal emergency coordination.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127796;</span><div><div class="mc-city">Maitland, Florida</div><div class="mc-role">Hurricane Response Center</div></div></div><p class="mc-body">Specialized in tropical storm and hurricane monitoring with advanced weather integration.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127968;</span><div><div class="mc-city">Melville, New York</div><div class="mc-role">Northeast Metro Hub</div></div></div><p class="mc-body">Handles the New York metro area with specialized urban security protocols.</p></div>
+        <div class="mc fade"><div class="mc-hd"><span class="mc-em">&#127751;</span><div><div class="mc-city">Walnut Creek, California</div><div class="mc-role">West Coast Innovation Lab</div></div></div><p class="mc-body">Tests and deploys cutting-edge monitoring technology, including AI-driven threat detection.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" style="position:relative;overflow:hidden">
+    <div style="position:absolute;top:-120px;left:-120px;width:500px;height:500px;border-radius:50%;background:rgba(0,87,184,.10);filter:blur(100px);pointer-events:none;z-index:0"></div>
+    <div class="container" style="position:relative;z-index:1">
+      <div class="form-wrap fade">
+        <div class="sec-hd" style="margin-bottom:36px">
+          <div class="sec-badge">&#128203; Get Started Today</div>
+          <h2 class="sec-title">Get Your <span class="gt">Free Quote</span></h2>
+          <p class="sec-sub">A no-obligation consultation with your local ADT security experts.</p>
+        </div>
+        <form id="form" novalidate>
+          <div class="f-row">
+            <div class="f-grp">
+              <label for="fname">Full Name <span style="color:var(--red)">*</span></label>
+              <input class="f-ctrl" type="text" id="fname" name="name" required placeholder="John Smith">
+            </div>
+            <div class="f-grp">
+              <label for="femail">Email Address <span style="color:var(--red)">*</span></label>
+              <input class="f-ctrl" type="email" id="femail" name="email" required placeholder="john@example.com">
+            </div>
+          </div>
+          <div class="f-row">
+            <div class="f-grp">
+              <label for="fphone">Phone Number <span style="color:var(--red)">*</span></label>
+              <input class="f-ctrl" type="tel" id="fphone" name="phone" required placeholder="(408) 555-1234">
+            </div>
+            <div class="f-grp">
+              <label for="fzip">Zip Code</label>
+              <input class="f-ctrl" type="text" id="fzip" name="zipcode" placeholder="94513" maxlength="5">
+            </div>
+          </div>
+          <div class="f-grp">
+            <label for="fpkg">Preferred Package</label>
+            <select class="f-ctrl" id="fpkg" name="package">
+              <option>Basic Protection &mdash; $42.99 / mo</option>
+              <option selected>Pulse Smart Home &mdash; $52.99 / mo</option>
+              <option>Total Intelligence &mdash; $64.99 / mo</option>
+            </select>
+          </div>
+          <div class="f-grp">
+            <label for="fnotes">Additional Notes</label>
+            <textarea class="f-ctrl" id="fnotes" name="message" rows="4" placeholder="Tell us about your home security needs..."></textarea>
+          </div>
+          <button type="submit" id="submitBtn" class="btn btn-p btn-w btn-lg" style="border:none;margin-top:6px">Request My Free Consultation &rarr;</button>
+          <p style="text-align:center;font-size:13px;color:var(--muted);margin-top:14px">&#128274; Your information is secure and will never be shared.</p>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="ft-grid">
         <div>
-            <h1>America's Most Trusted Security</h1>
-            <p>Professional monitoring and smart home protection for your family</p>
-            <p>ADT has been protecting homes for over 145 years</p>
-            <a href="#packages" class="btn">View Packages</a>
-            <a href="tel:+14089094484" class="btn btn-secondary">Call (408) 909-4484</a>
+          <div class="ft-logo">
+            <svg width="34" height="34" viewBox="0 0 100 100" fill="none">
+              <polygon points="30,8 70,8 92,30 92,70 70,92 30,92 8,70 8,30" fill="#0057b8" stroke="#06b6d4" stroke-width="2.5"/>
+              <text x="50" y="63" font-family="Arial,sans-serif" font-size="31" font-weight="900" fill="white" text-anchor="middle">ADT</text>
+            </svg>
+            <div><div style="font-family:'Syne',sans-serif;font-weight:700;font-size:14px">Direct Protection Security</div><div style="font-size:11px;color:var(--muted)">ADT Authorized Dealer</div></div>
+          </div>
+          <p class="ft-about">Professional ADT security solutions across the Bay Area and beyond. Protecting families and businesses since 2010.</p>
         </div>
-    </section>
-
-    <section id="packages">
-        <h2>Security Packages</h2>
-        <div class="grid">
-            <div class="card">
-                <h3>Bundle Package</h3>
-                <div class="price">$42.99<span style="font-size:0.4em">/mo</span></div>
-                <ul class="features">
-                    <li>Door & Window Sensors</li>
-                    <li>Motion Detectors</li>
-                    <li>24/7 Professional Monitoring</li>
-                    <li>Mobile App Control</li>
-                </ul>
-                <a href="tel:+14089094484" class="btn">Get Started</a>
-            </div>
-            
-            <div class="card">
-                <h3>Pulse Smart Home</h3>
-                <div class="price">$52.99<span style="font-size:0.4em">/mo</span></div>
-                <ul class="features">
-                    <li>Everything in Bundle</li>
-                    <li>HD Video Cameras</li>
-                    <li>Smart Home Automation</li>
-                    <li>Remote Access & Control</li>
-                </ul>
-                <a href="tel:+14089094484" class="btn">Get Started</a>
-            </div>
-            
-            <div class="card">
-                <h3>Complete Protection</h3>
-                <div class="price">$62.99<span style="font-size:0.4em">/mo</span></div>
-                <ul class="features">
-                    <li>Everything in Pulse</li>
-                    <li>Multiple Cameras</li>
-                    <li>Advanced Automation</li>
-                    <li>Premium Support</li>
-                </ul>
-                <a href="tel:+14089094484" class="btn">Get Started</a>
-            </div>
+        <div>
+          <div class="ft-col-t">Quick Links</div>
+          <ul class="ft-links">
+            <li><a href="#packages">Packages &amp; Pricing</a></li>
+            <li><a href="#technology">Technology</a></li>
+            <li><a href="#monitoring">Monitoring Centers</a></li>
+            <li><a href="#contact">Get a Free Quote</a></li>
+          </ul>
         </div>
-    </section>
-
-    <footer>
-        <p style="font-size:1.3em; margin-bottom:20px; font-weight:600">&copy; 2025 Direct Protection Security</p>
-        <p>Authorized ADT Dealer</p>
-    </footer>
+        <div>
+          <div class="ft-col-t">Resources</div>
+          <ul class="ft-links">
+            <li><a href="https://www.adt.com/about-adt" target="_blank" rel="noopener">About ADT</a></li>
+            <li><a href="https://www.adt.com/help" target="_blank" rel="noopener">Customer Support</a></li>
+            <li><a href="https://www.adt.com/privacy-policy" target="_blank" rel="noopener">Privacy Policy</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="ft-col-t">Contact Us</div>
+          <p style="font-size:14px;color:var(--muted);line-height:2.2">
+            &#128222; <a href="tel:4089094484" style="color:var(--muted);text-decoration:none">(408) 909-4484</a><br>
+            <span style="font-size:13px">Mon &ndash; Sat, 8 am &ndash; 7 pm PT</span>
+          </p>
+        </div>
+      </div>
+      <div class="ft-bot">
+        <span class="ft-copy">&copy; 2026 Direct Protection Security, Inc. All rights reserved.</span>
+        <span class="ft-copy">ADT Authorized Dealer &mdash; Not ADT LLC d/b/a ADT Security Services</span>
+      </div>
+    </div>
+  </footer>
 </div>
 
-<div id="login-modal" class="modal">
-    <div class="modal-content">
-        <h2>Dealer Login</h2>
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" id="login-password" placeholder="Enter password">
-        </div>
-        <button class="btn" onclick="login()">Login</button>
-        <button class="btn" onclick="closeLogin()" style="background:#6c757d; margin-top:10px">Cancel</button>
+<div id="portal">
+  <div class="p-hd">
+    <div class="p-hd-inner">
+      <div><div class="p-title">&#128202; DPS Commission Calculator</div><div class="p-sub">Complete Equipment Catalog &amp; Real-Time Commission Analysis</div></div>
+      <button onclick="closePortal()" class="btn btn-o" style="width:auto">&larr; Back to Website</button>
     </div>
-</div>
-
-<div id="dashboard">
-    <div class="dashboard-header">
-        <div style="max-width:1600px; margin:0 auto; display:flex; justify-content:space-between; align-items:center; flex-wrap: wrap;">
-            <div>
-                <h1>Dealer Dashboard</h1>
-                <p style="color:#666">Commission Calculator & Order Management</p>
+  </div>
+  <div class="p-wrap">
+    <div class="p-layout">
+      <div>
+        <div class="p-glass">
+          <div class="cust-card">
+            <div class="p-sec-t" style="margin-bottom:16px">&#128100; Customer Information</div>
+            <div class="cust-grid">
+              <div class="cg"><label>First Name</label><input type="text" id="cFirst" placeholder="John"></div>
+              <div class="cg"><label>Last Name</label><input type="text" id="cLast" placeholder="Smith"></div>
+              <div class="cg"><label>Date of Birth</label><input type="date" id="cDob"></div>
+              <div class="cg"><label>Phone Number</label><input type="tel" id="cPhone" placeholder="(408) 555-1234"></div>
+              <div class="cg"><label>Email Address</label><input type="email" id="cEmail" placeholder="john@example.com"></div>
+              <div class="cg"><label>Best Appt. Date &amp; Time</label><input type="datetime-local" id="cAppt"></div>
             </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
+            <div class="cust-grid-2">
+              <div class="cg"><label>Service Address</label><input type="text" id="cAddr" placeholder="123 Main St, City, CA 94513"></div>
+              <div class="cg"><label>Nearest Cross Street</label><input type="text" id="cCross" placeholder="Oak Ave &amp; 5th St"></div>
+            </div>
+          </div>
+          <div class="p-sec-t">&#128176; Deal Configuration</div>
+          <div class="p-row">
+            <div class="pfg">
+              <label>Package Type</label>
+              <select id="pkgType" onchange="handlePkgChange()">
+                <option value="36.99-1">Res-Basic &mdash; $36.99/mo (1&times;)</option>
+                <option value="42.99-1.75" selected>Res-Bundle 2 &mdash; $42.99/mo (1.75&times;)</option>
+                <option value="44.99-4">Res-Bundle 2A &mdash; $44.99/mo (4&times;)</option>
+                <option value="47.99-4.5">Res-Bundle GSM &mdash; $47.99/mo (4.5&times;)</option>
+                <option value="49.99-4">Res-Pulse 1A &mdash; $49.99/mo (4&times;)</option>
+                <option value="52.99-4.5">Res-Pulse 1B &mdash; $52.99/mo (4.5&times;)</option>
+                <option value="53.99-4.5">Res-Pulse 1C &mdash; $53.99/mo (4.5&times;)</option>
+                <option value="58.99-4">Res-Pulse 2A &mdash; $58.99/mo (4&times;)</option>
+                <option value="59.99-4">Res-Pulse 2B &mdash; $59.99/mo (4&times;)</option>
+                <option value="60.99-4">Res-Pulse 3A &mdash; $60.99/mo (4&times;)</option>
+                <option value="63.99-4">Res-Pulse 3B &mdash; $63.99/mo (4&times;)</option>
+                <option value="64.99-4">Res-Pulse 3C &mdash; $64.99/mo (4&times;)</option>
+                <option value="39.99-1">Comm-Basic &mdash; $39.99/mo (1&times;)</option>
+                <option value="45.99-5">Comm-Bundle 4 &mdash; $45.99/mo (5&times;)</option>
+                <option value="51.99-5">Comm-Pulse 1C &mdash; $51.99/mo (5&times;)</option>
+                <option value="58.99-5">Comm-Pulse 2C &mdash; $58.99/mo (5&times;)</option>
+                <option value="59.99-5">Comm-Pulse 2D &mdash; $59.99/mo (5&times;)</option>
+                <option value="custom">&#9999; Custom Monthly Rate</option>
+              </select>
+              <div id="cbox" class="cbox">
+                <div class="pfg"><label>Custom Rate ($/mo)</label><input type="number" id="customRate" step="0.01" min="0" placeholder="0.00" oninput="calc()"></div>
+                <div class="pfg"><label>Pass-Through Multiple</label><input type="number" id="customPass" step="0.25" min="0" placeholder="0" oninput="calc()"></div>
+              </div>
+            </div>
+            <div class="pfg">
+              <label>Credit Class</label>
+              <select id="creditClass" onchange="calc()">
+                <option value="35">A+ (775+) &mdash; 35&times;</option>
+                <option value="34">A (725&ndash;774) &mdash; 34&times;</option>
+                <option value="33">B (675&ndash;724) &mdash; 33&times;</option>
+                <option value="30">B&minus; (650&ndash;674) &mdash; 30&times;</option>
+                <option value="28">D (625&ndash;649) &mdash; 28&times;</option>
+                <option value="27">E (600&ndash;624) &mdash; 27&times;</option>
+                <option value="24">BULK (575&ndash;599) &mdash; 24&times;</option>
+                <option value="28">Commercial (&gt;75 score) &mdash; 28&times;</option>
+              </select>
+            </div>
+            <div class="pfg">
+              <label>Base Install Fee (min $150)</label>
+              <input type="number" id="installFee" value="150" min="150" step="10" oninput="calc()">
+            </div>
+            <div class="pfg">
+              <label>Upsell Amount ($)</label>
+              <input type="number" id="upsellAmt" value="0" min="0" step="10" oninput="calc()">
+            </div>
+          </div>
+          <button onclick="clearEquip()" class="btn btn-clr" style="padding:10px 16px;margin-bottom:4px">&#128465; Clear All Equipment</button>
+          <div class="p-sec-t" style="margin-top:26px">&#128295; Equipment Selection</div>
+          <div id="equipCatalog"></div>
         </div>
+      </div>
+      <div class="res-sticky">
+        <div class="bundle-chip">
+          <div class="b-sup">Recommended Package</div>
+          <div class="b-name" id="rBundleName">Basic Protection</div>
+          <div class="b-sub" id="rBundleDesc">Essential security monitoring</div>
+        </div>
+        <div class="res-panel">
+          <div class="r-item"><div class="r-lbl">Monthly Rate</div><div class="r-val" id="rRate">&mdash;</div></div>
+          <div class="r-item"><div class="r-lbl">Pass Through</div><div class="r-val" id="rPass">&mdash;</div></div>
+          <div class="r-item"><div class="r-lbl">Credit Multiple</div><div class="r-val" id="rBase">&mdash;</div></div>
+          <div class="r-item"><div class="r-lbl">Gross Commission</div><div class="r-val" id="rGross">&mdash;</div></div>
+          <div class="net-box">
+            <div class="r-lbl">&#128176; Net Commission</div>
+            <div class="r-val" id="rNet">&mdash;</div>
+          </div>
+          <div class="exp-box">
+            <h4>&#128188; Expense Breakdown</h4>
+            <div class="e-row"><span>DPS Fee</span><span id="eDps">&mdash;</span></div>
+            <div class="e-row"><span>Holdback (1.5&times; rate)</span><span id="eHold">&mdash;</span></div>
+            <div class="e-row"><span>Equipment Cost</span><span id="eEquip">&mdash;</span></div>
+            <div class="e-row"><span>Labor Cost</span><span id="eLabor">&mdash;</span></div>
+            <div id="laborDetail"></div>
+            <div class="e-tot"><span>Total Expenses</span><span id="eTotal">&mdash;</span></div>
+          </div>
+        </div>
+        <div class="ord-box">
+          <div class="ord-hd">&#128203; Order Summary <span id="itemCount" style="font-size:12px;font-weight:600">(0 items)</span></div>
+          <div class="ord-list" id="orderList"><p style="text-align:center;color:var(--muted);padding:18px 0;font-size:13px">No equipment selected</p></div>
+          <button onclick="copyOrder()" id="copyBtn" class="btn btn-cpy" style="padding:10px 16px">&#128203; Copy Order Details</button>
+        </div>
+      </div>
     </div>
-    
-    <div class="dashboard-content">
-        <div class="calculator-section">
-            <h2>Commission Calculator</h2>
-            
-            <div style="margin-bottom: 30px; padding: 20px; background: #e7f3ff; border-left: 4px solid #0069d9; border-radius: 8px;">
-                <div class="input-group">
-                    <label>Base Multiple (Admin Setting)</label>
-                    <input type="number" id="baseMultiple" value="35" step="0.5" style="max-width: 150px;">
-                    <small style="color: #666; display: block; margin-top: 5px;">Adjust this to change commission calculations across all deals</small>
-                </div>
-            </div>
-            
-            <div class="calc-grid">
-                <div>
-                    <div class="input-group">
-                        <label>Monthly Rate ($)</label>
-                        <select id="monthlyRate">
-                            <option value="42.99">$42.99 - Res-Bundle 2</option>
-                            <option value="44.99">$44.99 - Res-Bundle 2A</option>
-                            <option value="47.99">$47.99 - Res-Bundle GSM</option>
-                            <option value="49.99">$49.99 - Res-Pulse 1A</option>
-                            <option value="52.99">$52.99 - Res-Pulse 1A</option>
-                            <option value="53.99">$53.99 - Res-Pulse 1B</option>
-                            <option value="58.99">$58.99 - Res-Pulse 2A</option>
-                            <option value="59.99">$59.99 - Res-Pulse 3A/2B</option>
-                            <option value="60.99">$60.99 - Res-Pulse 3B</option>
-                            <option value="63.99">$63.99 - Res-Pulse 2B</option>
-                            <option value="64.99">$64.99 - Res-Pulse 3B</option>
-                            <option value="45.99">$45.99 - Comm-Bundle 4</option>
-                            <option value="51.99">$51.99 - Comm-Pulse 1C</option>
-                            <option value="58.99">$58.99 - Comm-Pulse 2C</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Credit Score Class</label>
-                        <select id="creditClass">
-                            <option value="A+">A+ (775+) - ACH Required</option>
-                            <option value="A">A (725-774) - ACH Required</option>
-                            <option value="B">B (675-724) - ACH Required</option>
-                            <option value="B-">B- (650-674) - ACH Required</option>
-                            <option value="D">D (625-649) - ACH Required</option>
-                            <option value="E">E (600-624) - ACH Required</option>
-                            <option value="BULK">BULK (575-599)</option>
-                            <option value="COMM">Commercial (>75)</option>
-                        </select>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Installation Fee ($)</label>
-                        <input type="number" id="installFee" value="150" step="10" min="0">
-                        <small style="color: #666; display: block; margin-top: 5px;">Minimum: $150 (per contract)</small>
-                    </div>
-                    
-                    <div class="input-group">
-                        <label>Additional Upsell Amount ($)</label>
-                        <input type="number" id="upsellAmount" value="0" step="10" min="0">
-                        <small style="color: #666; display: block; margin-top: 5px;">Any additional charges beyond equipment (100% retained)</small>
-                    </div>
-                    
-                    <div class="equipment-section">
-                        <h3 style="margin-bottom: 20px; color: #003d82;">Equipment Selection</h3>
-                        <div class="equipment-header">
-                            <div>Equipment Item</div>
-                            <div style="text-align: center;">Qty</div>
-                            <div style="text-align: center;">Sell Price</div>
-                            <div style="text-align: right;">Cost</div>
-                        </div>
-                        <div id="equipmentList"></div>
-                    </div>
-                    
-                    <button class="btn" onclick="calculate()" style="width:100%; margin-top:20px; font-size: 1.1em;">Calculate Commission</button>
-                </div>
-                
-                <div class="results-panel">
-                    <div class="result-item package-detected">
-                        <h3>Detected Package</h3>
-                        <div class="value" id="detectedPackage" style="font-size: 1.3em;">Basic</div>
-                    </div>
-                    
-                    <div class="result-item">
-                        <h3>Gross Commission</h3>
-                        <div class="value" id="grossCommission">$0.00</div>
-                    </div>
-                    
-                    <div class="deductions-breakdown">
-                        <h4 style="margin-bottom: 15px; font-size: 1.1em;">Deductions Breakdown</h4>
-                        <div class="deduction-line">
-                            <span>DPS Install Fee:</span>
-                            <span id="dpsDeduction">-$200.00</span>
-                        </div>
-                        <div class="deduction-line">
-                            <span>ADT Holdback (1.5x):</span>
-                            <span id="holdbackDeduction">-$0.00</span>
-                        </div>
-                        <div class="deduction-line">
-                            <span>Equipment Cost:</span>
-                            <span id="equipmentCost">-$0.00</span>
-                        </div>
-                        <div class="deduction-line">
-                            <span>Installation Labor:</span>
-                            <span id="laborCost">-$0.00</span>
-                        </div>
-                        <div class="deduction-line labor-detail" id="laborBase" style="display:none;">
-                            <span>• Base Install (5pt):</span>
-                            <span>-$150.00</span>
-                        </div>
-                        <div class="deduction-line labor-detail" id="laborCameras" style="display:none;">
-                            <span id="laborCameraText">• Cameras:</span>
-                            <span id="laborCameraAmount">$0.00</span>
-                        </div>
-                        <div class="deduction-line labor-detail" id="laborLocks" style="display:none;">
-                            <span id="laborLockText">• Locks:</span>
-                            <span id="laborLockAmount">$0.00</span>
-                        </div>
-                        <div class="deduction-line labor-detail" id="laborDoorbells" style="display:none;">
-                            <span id="laborDoorbellText">• Doorbells:</span>
-                            <span id="laborDoorbellAmount">$0.00</span>
-                        </div>
-                        <div class="deduction-line labor-detail" id="laborThermostats" style="display:none;">
-                            <span id="laborThermostatText">• Thermostats:</span>
-                            <span id="laborThermostatAmount">$0.00</span>
-                        </div>
-                        <div class="deduction-line">
-                            <span>Total Deductions:</span>
-                            <span id="totalDeductions">-$200.00</span>
-                        </div>
-                    </div>
-                    
-                    <div class="result-item" style="background: rgba(40, 167, 69, 0.2); border: 2px solid rgba(40, 167, 69, 0.5);">
-                        <h3>NET COMMISSION</h3>
-                        <div class="value" id="netCommission">$0.00</div>
-                    </div>
-                    
-                    <div class="result-item small">
-                        <h3>Monthly Recurring Revenue</h3>
-                        <div class="value" id="monthlyMRR">$42.99</div>
-                    </div>
-                    
-                    <div class="result-item small">
-                        <h3>Equipment Markup Profit</h3>
-                        <div class="value" id="equipmentProfit">$0.00</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="saved-orders">
-            <h3 style="color: #003d82; margin-bottom: 25px; font-size: 1.8em;">Saved Quotes</h3>
-            <div id="ordersList"><p style="text-align:center; color:#999; padding:20px">No quotes saved yet</p></div>
-            <button class="btn" onclick="exportOrders()" style="margin-top:20px">Export to CSV</button>
-        </div>
-    </div>
+  </div>
 </div>
 
 <script>
-const DEALER_PASSWORD = "ADT2025";
-let orders = [];
+// ---- Config ----
+var DEALER_PASS = 'ADT2025';
 
-const equipmentPrices = {
-    'ADT 7" Command Panel Wireless': 173.25,
-    'ADT Hybrid Panel Hardwired': 99.75,
-    'Command Panel Verizon LTE Radio': 52.50,
-    'Command Panel AT&T LTE Radio': 52.50,
-    'Command 2-Way Mini Wireless Sensor': 11.55,
-    'Command 2-Way Wireless Sensor': 11.24,
-    'Command 2-Way Wireless Motion Sensor': 22.58,
-    'Command 2-Way Wireless Keyfob': 11.55,
-    'Prewire/Hardwired Door Contact': 3.36,
-    'Prewire/Hardwired Window Contact': 3.36,
-    'Rollup Door Sensor': 38.75,
-    'Command 2-Way Wireless Glassbreak Sensor': 33.60,
-    'Command 2-Way Wireless Emergency Panic Button': 27.00,
-    'Command 2-Way Wireless Flood Sensor': 45.00,
-    'Command 2-Way Shock Sensor': 17.50,
-    'Command 2-Way Wireless Smoke Detector': 33.60,
-    'Command 2-Way Wireless Carbon Monoxide Detector': 39.00,
-    'Command 2-Way Wireless Smoke & Carbon Combo': 82.00,
-    'Command Panel Wireless to Wireless Translator': 50.00,
-    'Command Panel Hardwire to Wireless Translator': 52.50,
-    'Command Panel Outdoor Camera': 113.32,
-    'Command Panel Indoor Camera': 82.70,
-    'Command Panel 1080P Outdoor Camera': 164.99,
-    'Command Panel 1080P Indoor Camera': 117.42,
-    'Command Panel Doorbell': 107.49,
-    'Ring Doorbell Wireless 2 Camera': 157.16,
-    'Ring Doorbell Wireless Chime': 48.75,
-    'Ring Doorbell Wireless Chime Pro': 61.25,
-    'WiFi Repeater': 47.50,
-    'Command Panel Garage Door Control': 84.21,
-    'Command Panel Garage Door Control MYQ Liftmaster': 54.21,
-    'Command Panel Z-Wave Lamp Module': 31.29,
-    'Command Panel Z-Wave Lightbulb': 31.24,
-    'Command Panel Z-Wave Thermostat': 87.14,
-    'Command Panel Z-Wave Wall Dimmer Switch': 37.49,
-    'Command Panel Z-Wave Kwikset Door Lock - Bronze': 118.88,
-    'Command Panel Z-Wave Kwikset Door Lock - Gold': 118.88,
-    'Command Panel Z-Wave Kwikset Door Lock - Silver': 118.88,
-    '7" Secondary Touchscreen Keypad': 105.00,
-    '7" Secondary Touchscreen Deskmount Kit': 24.99,
-    '7" Secondary Touchscreen Wallmount Kit': 27.49,
-    'Command Panel Deskmount': 18.74,
-    'Hybrid Panel Hardwired Keypad': 40.00,
-    'Wireless Touchpad': 62.50
+// ---- Scroll progress ----
+window.addEventListener('scroll', function() {
+  var el = document.documentElement;
+  var pct = el.scrollTop / (el.scrollHeight - el.clientHeight) * 100 || 0;
+  document.getElementById('scrollBar').style.width = pct + '%';
+}, { passive: true });
+
+// ---- Scroll reveal ----
+var revealIO = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) { if (e.isIntersecting) e.target.classList.add('in'); });
+}, { threshold: 0.08, rootMargin: '0px 0px -36px 0px' });
+document.querySelectorAll('.fade').forEach(function(el) { revealIO.observe(el); });
+
+// ---- Mobile nav ----
+function toggleNav() {
+  document.getElementById('mainNav').classList.toggle('open');
+}
+document.querySelectorAll('#mainNav a').forEach(function(a) {
+  a.addEventListener('click', function() { document.getElementById('mainNav').classList.remove('open'); });
+});
+
+// ---- Smooth scroll ----
+document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+  a.addEventListener('click', function(e) {
+    if (document.getElementById('portal').classList.contains('on')) return;
+    var target = document.querySelector(this.getAttribute('href'));
+    if (target) { e.preventDefault(); target.scrollIntoView({ behavior: 'smooth' }); }
+  });
+});
+
+// ---- Login modal ----
+function openModal() {
+  document.getElementById('loginModal').classList.add('on');
+  document.getElementById('dealerPw').value = '';
+  document.getElementById('loginErr').style.display = 'none';
+  document.body.style.overflow = 'hidden';
+  setTimeout(function() { document.getElementById('dealerPw').focus(); }, 60);
+}
+function closeModal() {
+  document.getElementById('loginModal').classList.remove('on');
+  document.body.style.overflow = '';
+}
+document.addEventListener('keydown', function(e) { if (e.key === 'Escape') closeModal(); });
+
+function doLogin() {
+  if (document.getElementById('dealerPw').value === DEALER_PASS) {
+    closeModal();
+    openPortal();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+    document.getElementById('dealerPw').value = '';
+    document.getElementById('dealerPw').focus();
+  }
+}
+
+// ---- Contact form (Web3Forms) ----
+var form = document.getElementById('form');
+var submitBtn = form.querySelector('button[type="submit"]');
+
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  var formData = new FormData(form);
+  formData.append('access_key', 'ca27e8ab-8552-4fd0-8767-c8c4381fc400');
+  var originalText = submitBtn.textContent;
+  submitBtn.textContent = 'Sending...';
+  submitBtn.disabled = true;
+  try {
+    var response = await fetch('https://api.web3forms.com/submit', { method: 'POST', body: formData });
+    var data = await response.json();
+    if (response.ok) {
+      alert('Success! Your message has been sent.');
+      form.reset();
+    } else {
+      alert('Error: ' + data.message);
+    }
+  } catch (err) {
+    alert('Something went wrong. Please try again.');
+  } finally {
+    submitBtn.textContent = originalText;
+    submitBtn.disabled = false;
+  }
+});
+
+// ---- Portal open / close ----
+var portalReady = false;
+function openPortal() {
+  document.getElementById('mainSite').classList.add('hidden');
+  document.getElementById('portal').classList.add('on');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  if (!portalReady) { buildCatalog(); portalReady = true; }
+  calc();
+}
+function closePortal() {
+  document.getElementById('portal').classList.remove('on');
+  document.getElementById('mainSite').classList.remove('hidden');
+  window.scrollTo({ top: 0, behavior: 'instant' });
+}
+
+// ---- Package selector ----
+function handlePkgChange() {
+  var isCustom = document.getElementById('pkgType').value === 'custom';
+  document.getElementById('cbox').classList.toggle('on', isCustom);
+  calc();
+}
+
+// ---- Equipment database ----
+var EQUIP = {
+  'panel-wireless':    { n:'ADT 7" Command Panel Wireless',   p:173.25, m:'ADT7AIO-1',     l:0,  cat:'Control Panels' },
+  'panel-hardwired':   { n:'ADT Hybrid Panel Hardwired',       p:99.75,  m:'ADTHYBWL-2',   l:0,  cat:'Control Panels' },
+  'radio-verizon':     { n:'Verizon LTE Radio',                p:52.50,  m:'ADTLTE-V',     l:0,  cat:'Cellular Radios' },
+  'radio-att':         { n:'AT&T LTE Radio',                   p:52.50,  m:'ADTLTE-A',     l:0,  cat:'Cellular Radios' },
+  'sensor-mini':       { n:'2-Way Mini Wireless Sensor',       p:11.55,  m:'SIXMINICT',    l:0,  cat:'Sensors & Contacts' },
+  'sensor-wireless':   { n:'2-Way Wireless Sensor',            p:11.24,  m:'SIXCTA',       l:0,  cat:'Sensors & Contacts' },
+  'sensor-motion':     { n:'2-Way Wireless Motion Sensor',     p:22.58,  m:'SIXPIRA',      l:0,  cat:'Sensors & Contacts' },
+  'sensor-keyfob':     { n:'2-Way Wireless Keyfob',            p:11.55,  m:'SIXFOBA',      l:0,  cat:'Sensors & Contacts' },
+  'contact-door':      { n:'Hardwired Door Contact',           p:3.36,   m:'GI-20RSTWH',   l:0,  cat:'Sensors & Contacts' },
+  'contact-window':    { n:'Hardwired Window Contact',         p:3.36,   m:'0E-2531WGW10', l:0,  cat:'Sensors & Contacts' },
+  'sensor-rollup':     { n:'Roll-Up Door Sensor',              p:38.75,  m:'958',           l:0,  cat:'Sensors & Contacts' },
+  'glass-break':       { n:'Wireless Glass-Break Sensor',      p:33.60,  m:'SIXGBA',       l:0,  cat:'Panic, Glass Break & Flood' },
+  'panic-button':      { n:'Wireless Panic Button',            p:27.00,  m:'SIXPANICA',    l:0,  cat:'Panic, Glass Break & Flood' },
+  'flood-sensor':      { n:'Wireless Flood Sensor',            p:45.00,  m:'SIXFLOODA',    l:0,  cat:'Panic, Glass Break & Flood' },
+  'shock-sensor':      { n:'Wireless Shock Sensor',            p:17.50,  m:'SIXSHOCKA',    l:0,  cat:'Panic, Glass Break & Flood' },
+  'smoke':             { n:'Wireless Smoke Detector',          p:33.60,  m:'SIXSMOKEA',    l:0,  cat:'Smoke & CO' },
+  'co':                { n:'Wireless CO Detector',             p:39.00,  m:'SIXCOA',       l:0,  cat:'Smoke & CO' },
+  'smoke-co':          { n:'Wireless Smoke & CO Combo',        p:82.00,  m:'SIXCOMBOA',    l:0,  cat:'Smoke & CO' },
+  'translator-ww':     { n:'Wireless-to-Wireless Translator',  p:50.00,  m:'ADTCONVERT',   l:0,  cat:'Translators' },
+  'translator-hw':     { n:'Hardwire-to-Wireless Translator',  p:52.50,  m:'SIXC2WA',      l:0,  cat:'Translators' },
+  'cam-outdoor':       { n:'Outdoor Camera',                   p:113.32, m:'OC835V4',      l:50, cat:'Cameras & Doorbells' },
+  'cam-indoor':        { n:'Indoor Camera',                    p:82.70,  m:'RC8326-V2',    l:50, cat:'Cameras & Doorbells' },
+  'cam-1080-out':      { n:'1080P Outdoor Camera',             p:164.99, m:'ADC-V722W',    l:50, cat:'Cameras & Doorbells' },
+  'cam-1080-in':       { n:'1080P Indoor Camera',              p:117.42, m:'ADC-522-IR',   l:50, cat:'Cameras & Doorbells' },
+  'doorbell':          { n:'Video Doorbell',                   p:107.49, m:'N8-DBC835V2',  l:35, cat:'Cameras & Doorbells' },
+  'ring-doorbell':     { n:'Ring Video Doorbell (Gen 2)',       p:157.16, m:'7G-8VR1S7OEN', l:35, cat:'Cameras & Doorbells' },
+  'ring-chime':        { n:'Ring Chime',                       p:48.75,  m:'Accessory',    l:0,  cat:'Cameras & Doorbells' },
+  'ring-chime-pro':    { n:'Ring Chime Pro',                   p:61.25,  m:'Accessory',    l:0,  cat:'Cameras & Doorbells' },
+  'wifi-repeater':     { n:'Wi-Fi Repeater',                   p:47.50,  m:'W9-WN3000RP',  l:0,  cat:'Cameras & Doorbells' },
+  'garage-zwave':      { n:'Z-Wave Garage Door Control',       p:84.21,  m:'LN-GD00Z6',    l:0,  cat:'Smart Home' },
+  'garage-myq':        { n:'MyQ LiftMaster Garage',            p:54.21,  m:'02-G821LMB',   l:0,  cat:'Smart Home' },
+  'lamp-module':       { n:'Z-Wave Lamp Module',               p:31.29,  m:'JS-28170',     l:0,  cat:'Smart Home' },
+  'lightbulb':         { n:'Z-Wave Smart Bulb',                p:31.24,  m:'JS-39723',     l:0,  cat:'Smart Home' },
+  'thermostat':        { n:'Z-Wave Smart Thermostat',          p:87.14,  m:'NJ-ADCT2000A', l:35, cat:'Smart Home' },
+  'dimmer':            { n:'Z-Wave Dimmer Switch',             p:37.49,  m:'JS-45712',     l:0,  cat:'Smart Home' },
+  'lock-bronze':       { n:'Kwikset Smart Lock Bronze',        p:118.88, m:'KT-99100079',  l:35, cat:'Smart Locks' },
+  'lock-gold':         { n:'Kwikset Smart Lock Gold',          p:118.88, m:'KT-99100077',  l:35, cat:'Smart Locks' },
+  'lock-silver':       { n:'Kwikset Smart Lock Silver',        p:118.88, m:'KT99100078',   l:35, cat:'Smart Locks' },
+  'touchscreen':       { n:'7" Secondary Touchscreen',         p:105.00, m:'WTS700',       l:0,  cat:'Keypads & Accessories' },
+  'deskmount-7':       { n:'7" Desk-Mount Kit',                p:24.99,  m:'DESKMT-WTS',   l:0,  cat:'Keypads & Accessories' },
+  'wallmount-7':       { n:'7" Wall-Mount Kit',                p:27.49,  m:'WALLMT-WTS',   l:0,  cat:'Keypads & Accessories' },
+  'deskmount-cmd':     { n:'Command Panel Desk-Mount',         p:18.74,  m:'DESKMT-AIO',   l:0,  cat:'Keypads & Accessories' },
+  'keypad-hw':         { n:'Hardwired Keypad',                 p:40.00,  m:'WTP100',       l:0,  cat:'Keypads & Accessories' },
+  'touchpad-wireless': { n:'Wireless Touchpad',                p:62.50,  m:'WLTP100',      l:0,  cat:'Keypads & Accessories' }
 };
 
-function showLogin() {
-    document.getElementById('login-modal').classList.add('active');
-}
+var qty = {};
 
-function closeLogin() {
-    document.getElementById('login-modal').classList.remove('active');
-    document.getElementById('login-password').value = '';
-}
-
-function login() {
-    const pwd = document.getElementById('login-password').value;
-    if (pwd === DEALER_PASSWORD) {
-        document.getElementById('main-content').style.display = 'none';
-        document.getElementById('main-header').style.display = 'none';
-        document.getElementById('dashboard').classList.add('active');
-        closeLogin();
-        initializeEquipment();
-        calculate();
-    } else {
-        alert('Incorrect password');
-    }
-}
-
-function logout() {
-    document.getElementById('main-content').style.display = 'block';
-    document.getElementById('main-header').style.display = 'block';
-    document.getElementById('dashboard').classList.remove('active');
-}
-
-function initializeEquipment() {
-    const list = document.getElementById('equipmentList');
-    list.innerHTML = '';
-    
-    Object.entries(equipmentPrices).forEach(([name, cost]) => {
-        const safeId = name.replace(/[^a-zA-Z0-9]/g, '');
-        const div = document.createElement('div');
-        div.className = 'equipment-item';
-        div.id = 'item-' + safeId;
-        div.innerHTML = `
-            <div>
-                <label>${name}</label>
-                <div class="cost">Cost: $${cost.toFixed(2)}</div>
-            </div>
-            <input type="number" id="qty-${safeId}" value="0" min="0" max="20" style="width: 100%;">
-            <input type="number" id="price-${safeId}" placeholder="$0.00" step="<function_calls>
-<invoke name="artifacts">
-<parameter name="command">update</parameter>
-<parameter name="id">dps-commission-calc</parameter>
-<parameter name="old_str">            <input type="number" id="price-${safeId}" placeholder="$0.00" step="</parameter>
-<parameter name="new_str">            <input type="number" id="price-${safeId}" placeholder="$0.00" step="0.01" min="0" style="width: 100%;">
-            <div class="subtotal" id="sub-${safeId}">$0.00</div>
-        `;
-        list.appendChild(div);
+function buildCatalog() {
+  var cats = {};
+  Object.keys(EQUIP).forEach(function(id) {
+    var c = EQUIP[id].cat;
+    if (!cats[c]) cats[c] = [];
+    cats[c].push(id);
+  });
+  var h = '';
+  Object.keys(cats).forEach(function(cat) {
+    h += '<div class="eq-cat">' + cat + '</div><div class="eq-grid">';
+    cats[cat].forEach(function(id) {
+      var e = EQUIP[id];
+      var q = qty[id] || 0;
+      var sel = q > 0 ? ' sel' : '';
+      var labor = e.l > 0 ? ' + Labor: $' + e.l : '';
+      h += '<div class="eq-card' + sel + '" id="ec-' + id + '">';
+      h += '<div class="eq-name">' + e.n + '</div>';
+      h += '<div class="eq-price">$' + e.p.toFixed(2) + '</div>';
+      h += '<small class="eq-model">' + e.m + labor + '</small>';
+      h += '<div class="eq-qty">';
+      h += '<button onclick="chQty(\'' + id + '\',-1)">&#8722;</button>';
+      h += '<input type="number" value="' + q + '" min="0" onchange="stQty(\'' + id + '\',this.value)">';
+      h += '<button onclick="chQty(\'' + id + '\',1)">+</button>';
+      h += '</div></div>';
     });
-    
-    document.querySelectorAll('.equipment-item input').forEach(input => {
-        input.addEventListener('change', () => {
-            const safeId = input.id.replace('qty-', '').replace('price-', '');
-            updateItem(safeId);
-        });
-    });
+    h += '</div>';
+  });
+  document.getElementById('equipCatalog').innerHTML = h;
 }
 
-function updateItem(safeId) {
-    const itemDiv = document.getElementById('item-' + safeId);
-    const qtyInput = document.getElementById('qty-' + safeId);
-    
-    if (itemDiv && qtyInput) {
-        const qty = parseInt(qtyInput.value) || 0;
-        if (qty > 0) {
-            itemDiv.classList.add('has-qty');
-        } else {
-            itemDiv.classList.remove('has-qty');
-        }
-    }
-    
-    calculate();
+function chQty(id, d) {
+  qty[id] = Math.max(0, (qty[id] || 0) + d);
+  refreshCard(id);
+  calc();
+}
+function stQty(id, v) {
+  qty[id] = Math.max(0, parseInt(v) || 0);
+  refreshCard(id);
+  calc();
+}
+function refreshCard(id) {
+  var el = document.getElementById('ec-' + id);
+  if (!el) return;
+  el.classList.toggle('sel', (qty[id] || 0) > 0);
+  el.querySelector('input').value = qty[id] || 0;
+}
+function clearEquip() {
+  if (!confirm('Clear all equipment selections?')) return;
+  qty = {};
+  buildCatalog();
+  calc();
 }
 
-function detectPackage(hasCamera, hasPulseFeatures, totalEquipment) {
-    if (hasCamera || hasPulseFeatures) {
-        if (totalEquipment > 10) {
-            return 'Complete Protection';
-        } else {
-            return 'Pulse Smart Home';
-        }
-    } else if (totalEquipment > 0) {
-        return 'Bundle Package';
+function fmt(n) { return '$' + Math.abs(n).toFixed(2); }
+
+function calc() {
+  var v = document.getElementById('pkgType').value;
+  var rate, pass;
+  if (v === 'custom') {
+    rate = parseFloat(document.getElementById('customRate').value) || 0;
+    pass = parseFloat(document.getElementById('customPass').value) || 0;
+  } else {
+    var parts = v.split('-');
+    rate = parseFloat(parts[0]);
+    pass = parseFloat(parts[1]);
+  }
+  var base   = parseInt(document.getElementById('creditClass').value) || 35;
+  var upsell = parseFloat(document.getElementById('upsellAmt').value) || 0;
+  var baseLbr = Math.max(150, parseFloat(document.getElementById('installFee').value) || 150);
+  var equipCost = 0, laborCost = baseLbr;
+  var laborLines = [{ n: 'Base Install', c: baseLbr }];
+  var camCount = 0, hasLock = false, hasThermostat = false, hasDoorbell = false, totalDev = 0;
+
+  Object.keys(qty).forEach(function(id) {
+    var q = qty[id];
+    if (q > 0 && EQUIP[id]) {
+      var e = EQUIP[id];
+      equipCost += e.p * q;
+      totalDev  += q;
+      if (id.indexOf('cam-') === 0)                            camCount += q;
+      if (id === 'doorbell' || id === 'ring-doorbell')         hasDoorbell = true;
+      if (id.indexOf('lock-') === 0)                           hasLock = true;
+      if (id === 'thermostat')                                 hasThermostat = true;
+      if (e.l > 0) {
+        laborCost += e.l * q;
+        laborLines.push({ n: e.n + ' (' + q + 'x$' + e.l + ')', c: e.l * q });
+      }
     }
-    return 'Basic';
+  });
+
+  var bName = 'Basic Protection', bDesc = 'Essential security monitoring', bClr = '#94a3b8';
+  if      (camCount >= 4 && hasLock && hasThermostat)                  { bName = 'Total Intelligence';  bDesc = 'Premium multi-camera + full automation';   bClr = '#a78bfa'; }
+  else if ((camCount > 0 || hasDoorbell) && (hasLock || hasThermostat)){ bName = 'Pulse Smart Home';    bDesc = 'Smart security with video + automation';    bClr = '#22c55e'; }
+  else if (camCount > 0 || hasLock || hasThermostat || hasDoorbell)    { bName = 'Pulse Entry';         bDesc = 'Enhanced security with smart integration';  bClr = '#06b6d4'; }
+  else if (totalDev >= 5)                                               { bName = 'Enhanced Basic';     bDesc = 'Comprehensive whole-home sensor coverage';  bClr = '#60a5fa'; }
+
+  var rbn = document.getElementById('rBundleName');
+  rbn.textContent = bName; rbn.style.color = bClr;
+  document.getElementById('rBundleDesc').textContent = bDesc;
+
+  var gross    = rate * base;
+  var DPS_FEE  = 200;
+  var hold     = rate * 1.5;
+  var totalExp = DPS_FEE + hold + equipCost + laborCost;
+  var net      = gross - totalExp + upsell;
+
+  document.getElementById('rRate').textContent  = fmt(rate);
+  document.getElementById('rPass').textContent  = pass + 'x';
+  document.getElementById('rBase').textContent  = base + 'x';
+  document.getElementById('rGross').textContent = fmt(gross);
+  document.getElementById('rNet').textContent   = fmt(net);
+  document.getElementById('eDps').textContent   = '-' + fmt(DPS_FEE);
+  document.getElementById('eHold').textContent  = '-' + fmt(hold);
+  document.getElementById('eEquip').textContent = '-' + fmt(equipCost);
+  document.getElementById('eLabor').textContent = '-' + fmt(laborCost);
+  document.getElementById('eTotal').textContent = '-' + fmt(totalExp);
+  document.getElementById('laborDetail').innerHTML = laborLines.map(function(l) {
+    return '<div style="display:flex;justify-content:space-between;padding:3px 0"><span>&#183; ' + l.n + '</span><span>-$' + l.c.toFixed(2) + '</span></div>';
+  }).join('');
+  updateOrderList();
 }
 
-function calculate() {
-    const monthlyRate = parseFloat(document.getElementById('monthlyRate').value);
-    const baseMultiple = parseFloat(document.getElementById('baseMultiple').value);
-    const upsellAmount = parseFloat(document.getElementById('upsellAmount').value) || 0;
-    
-    let totalEquipmentCost = 0;
-    let totalEquipmentPrice = 0;
-    let cameraCount = 0;
-    let lockCount = 0;
-    let doorbellCount = 0;
-    let thermostatCount = 0;
-    let totalItems = 0;
-    let hasPulseFeatures = false;
-    
-    Object.entries(equipmentPrices).forEach(([name, cost]) => {
-        const safeId = name.replace(/[^a-zA-Z0-9]/g, '');
-        const qtyInput = document.getElementById('qty-' + safeId);
-        const priceInput = document.getElementById('price-' + safeId);
-        const subtotalDiv = document.getElementById('sub-' + safeId);
-        
-        if (qtyInput && priceInput && subtotalDiv) {
-            const qty = parseInt(qtyInput.value) || 0;
-            const price = parseFloat(priceInput.value) || 0;
-            
-            const itemCost = cost * qty;
-            const itemRevenue = price * qty;
-            
-            totalEquipmentCost += itemCost;
-            totalEquipmentPrice += itemRevenue;
-            totalItems += qty;
-            
-            subtotalDiv.textContent = '$' + itemCost.toFixed(2);
-            
-            const lowerName = name.toLowerCase();
-            if (lowerName.includes('camera') && qty > 0) {
-                cameraCount += qty;
-                hasPulseFeatures = true;
-            }
-            if (lowerName.includes('lock') && qty > 0) {
-                lockCount += qty;
-                hasPulseFeatures = true;
-            }
-            if (lowerName.includes('doorbell') && qty > 0) {
-                doorbellCount += qty;
-                hasPulseFeatures = true;
-            }
-            if (lowerName.includes('thermostat') && qty > 0) {
-                thermostatCount += qty;
-                hasPulseFeatures = true;
-            }
-            if ((lowerName.includes('z-wave') || lowerName.includes('smart')) && qty > 0) {
-                hasPulseFeatures = true;
-            }
-        }
-    });
-    
-    const detectedPackage = detectPackage(cameraCount > 0, hasPulseFeatures, totalItems);
-    document.getElementById('detectedPackage').textContent = detectedPackage;
-    
-    let laborCost = 150;
-    const laborCamerasCost = cameraCount * 50;
-    const laborLocksCost = lockCount * 35;
-    const laborDoorbellsCost = doorbellCount * 35;
-    const laborThermostatsCost = thermostatCount * 35;
-    
-    laborCost += laborCamerasCost + laborLocksCost + laborDoorbellsCost + laborThermostatsCost;
-    
-    document.getElementById('laborBase').style.display = 'flex';
-    
-    if (cameraCount > 0) {
-        document.getElementById('laborCameras').style.display = 'flex';
-        document.getElementById('laborCameraText').textContent = `• Cameras (${cameraCount} × $50):`;
-        document.getElementById('laborCameraAmount').textContent = '-$' + laborCamerasCost.toFixed(2);
-    } else {
-        document.getElementById('laborCameras').style.display = 'none';
+function updateOrderList() {
+  var items = [], total = 0;
+  Object.keys(qty).forEach(function(id) {
+    var q = qty[id];
+    if (q > 0 && EQUIP[id]) {
+      var e = EQUIP[id];
+      items.push({ n: e.n, m: e.m, q: q, t: (e.p + e.l) * q });
+      total += q;
     }
-    
-    if (lockCount > 0) {
-        document.getElementById('laborLocks').style.display = 'flex';
-        document.getElementById('laborLockText').textContent = `• Locks (${lockCount} × $35):`;
-        document.getElementById('laborLockAmount').textContent = '-$' + laborLocksCost.toFixed(2);
-    } else {
-        document.getElementById('laborLocks').style.display = 'none';
-    }
-    
-    if (doorbellCount > 0) {
-        document.getElementById('laborDoorbells').style.display = 'flex';
-        document.getElementById('laborDoorbellText').textContent = `• Doorbells (${doorbellCount} × $35):`;
-        document.getElementById('laborDoorbellAmount').textContent = '-$' + doorbellsCost.toFixed(2);
-    } else {
-        document.getElementById('laborDoorbells').style.display = 'none';
-    }
-    
-    if (thermostatCount > 0) {
-        document.getElementById('laborThermostats').style.display = 'flex';
-        document.getElementById('laborThermostatText').textContent = `• Thermostats (${thermostatCount} × $35):`;
-        document.getElementById('laborThermostatAmount').textContent = '-$' + laborThermostatsCost.toFixed(2);
-    } else {
-        document.getElementById('laborThermostats').style.display = 'none';
-    }
-    
-    const grossCommission = monthlyRate * baseMultiple;
-    const dpsDeduction = 200;
-    const holdbackDeduction = monthlyRate * 1.5;
-    
-    const equipmentMarkup = totalEquipmentPrice - totalEquipmentCost;
-    const totalDeductions = dpsDeduction + holdbackDeduction + totalEquipmentCost + laborCost;
-    const netCommission = grossCommission - totalDeductions + equipmentMarkup + upsellAmount;
-    
-    document.getElementById('grossCommission').textContent = '$' + grossCommission.toFixed(2);
-    document.getElementById('dpsDeduction').textContent = '-$' + dpsDeduction.toFixed(2);
-    document.getElementById('holdbackDeduction').textContent = '-$' + holdbackDeduction.toFixed(2);
-    document.getElementById('equipmentCost').textContent = '-$' + totalEquipmentCost.toFixed(2);
-    document.getElementById('laborCost').textContent = '-$' + laborCost.toFixed(2);
-    document.getElementById('totalDeductions').textContent = '-$' + totalDeductions.toFixed(2);
-    document.getElementById('netCommission').textContent = '$' + netCommission.toFixed(2);
-    document.getElementById('monthlyMRR').textContent = '$' + monthlyRate.toFixed(2);
-    document.getElementById('equipmentProfit').textContent = '$' + (equipmentMarkup + upsellAmount).toFixed(2);
+  });
+  document.getElementById('itemCount').textContent = '(' + total + ' item' + (total !== 1 ? 's' : '') + ')';
+  if (items.length) {
+    document.getElementById('orderList').innerHTML = items.map(function(it) {
+      return '<div class="ord-line"><div><div class="o-name">' + it.n + '</div><div class="o-sub">' + it.m + ' x ' + it.q + '</div></div><div class="o-price">$' + it.t.toFixed(2) + '</div></div>';
+    }).join('');
+  } else {
+    document.getElementById('orderList').innerHTML = '<p style="text-align:center;color:var(--muted);padding:18px 0;font-size:13px">No equipment selected</p>';
+  }
 }
 
-function exportOrders() {
-    if (orders.length === 0) {
-        alert('No orders to export');
-        return;
-    }
-    
-    const csv = [
-        ['Date', 'Package', 'Monthly Rate', 'Credit Class', 'Gross Commission', 'Net Commission', 'Equipment Cost'].join(','),
-        ...orders.map(o => [o.date, o.package, o.monthlyRate, o.creditClass, o.grossCommission, o.netCommission, o.equipmentCost].join(','))
-    ].join('\n');
-    
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'dps_commissions_' + new Date().toISOString().split('T')[0] + '.csv';
-    a.click();
-    URL.revokeObjectURL(url);
-}
+function copyOrder() {
+  var v = document.getElementById('pkgType').value;
+  var pkgTxt = v === 'custom'
+    ? 'Custom - $' + document.getElementById('customRate').value + '/mo (' + document.getElementById('customPass').value + 'x)'
+    : document.getElementById('pkgType').selectedOptions[0].text;
 
-document.getElementById('monthlyRate').addEventListener('change', calculate);
-document.getElementById('creditClass').addEventListener('change', calculate);
-document.getElementById('baseMultiple').addEventListener('input', calculate);
-document.getElementById('installFee').addEventListener('input', calculate);
-document.getElementById('upsellAmount').addEventListener('input', calculate);
-document.getElementById('login-password').addEventListener('keypress', function(e) {
-    if (e.key === 'Enter') login();
-});
+  var cFirst   = document.getElementById('cFirst').value.trim();
+  var cLast    = document.getElementById('cLast').value.trim();
+  var cDobRaw  = document.getElementById('cDob').value;
+  var cPhone   = document.getElementById('cPhone').value.trim();
+  var cEmail   = document.getElementById('cEmail').value.trim();
+  var cApptRaw = document.getElementById('cAppt').value;
+  var cAddr    = document.getElementById('cAddr').value.trim();
+  var cCross   = document.getElementById('cCross').value.trim();
+
+  var cApptFmt = '(not entered)';
+  if (cApptRaw) {
+    var da = new Date(cApptRaw);
+    cApptFmt = da.toLocaleDateString('en-US', { weekday:'long', year:'numeric', month:'long', day:'numeric' })
+             + ' at ' + da.toLocaleTimeString('en-US', { hour:'numeric', minute:'2-digit', hour12:true });
+  }
+  var cDobFmt = '(not entered)';
+  if (cDobRaw) {
+    var dd = new Date(cDobRaw + 'T00:00:00');
+    cDobFmt = dd.toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  }
+
+  var NL = '\n';
+  var SEP = '--------------------------------------' + NL;
+  var t = '';
+  t += '======================================' + NL;
+  t += '     DPS DEALER ORDER SUMMARY' + NL;
+  t += '======================================' + NL + NL;
+  t += SEP;
+  t += 'CUSTOMER INFORMATION' + NL;
+  t += SEP;
+  t += 'Name:          ' + ([cFirst, cLast].filter(Boolean).join(' ') || '(not entered)') + NL;
+  t += 'Date of Birth: ' + cDobFmt + NL;
+  t += 'Phone:         ' + (cPhone || '(not entered)') + NL;
+  t += 'Email:         ' + (cEmail || '(not entered)') + NL;
+  t += 'Address:       ' + (cAddr  || '(not entered)') + NL;
+  t += 'Cross Street:  ' + (cCross || '(not entered)') + NL;
+  t += 'Appointment:   ' + cApptFmt + NL + NL;
+  t += SEP;
+  t += 'DEAL DETAILS' + NL;
+  t += SEP;
+  t += 'Package:      ' + document.getElementById('rBundleName').textContent + NL;
+  t += 'Description:  ' + document.getElementById('rBundleDesc').textContent + NL + NL;
+  t += 'Selected Pkg: ' + pkgTxt + NL;
+  t += 'Credit Class: ' + document.getElementById('creditClass').selectedOptions[0].text + NL;
+  t += 'Install Fee:  $' + document.getElementById('installFee').value + NL;
+  t += 'Upsell:       $' + document.getElementById('upsellAmt').value + NL + NL;
+  t += SEP;
+  t += 'EQUIPMENT LIST' + NL;
+  t += SEP + NL;
+  var has = false;
+  Object.keys(qty).forEach(function(id) {
+    var q = qty[id];
+    if (q > 0 && EQUIP[id]) {
+      has = true;
+      var e = EQUIP[id];
+      t += '- ' + e.n + NL;
+      t += '  Model: ' + e.m + '   Qty: ' + q + NL;
+      t += '  Unit: $' + e.p.toFixed(2) + (e.l > 0 ? ' + $' + e.l + ' labor' : '') + NL;
+      t += '  Line Total: $' + ((e.p + e.l) * q).toFixed(2) + NL + NL;
+    }
+  });
+  if (!has) { t += '(No equipment selected)' + NL + NL; }
+  t += SEP;
+  t += 'COMMISSION BREAKDOWN' + NL;
+  t += SEP + NL;
+  t += 'Monthly Rate:     ' + document.getElementById('rRate').textContent + NL;
+  t += 'Pass Through:     ' + document.getElementById('rPass').textContent + NL;
+  t += 'Credit Multiple:  ' + document.getElementById('rBase').textContent + NL;
+  t += 'Gross Commission: ' + document.getElementById('rGross').textContent + NL + NL;
+  t += 'DPS Fee:          ' + document.getElementById('eDps').textContent + NL;
+  t += 'Holdback:         ' + document.getElementById('eHold').textContent + NL;
+  t += 'Equipment:        ' + document.getElementById('eEquip').textContent + NL;
+  t += 'Labor:            ' + document.getElementById('eLabor').textContent + NL;
+  t += 'Total Expenses:   ' + document.getElementById('eTotal').textContent + NL + NL;
+  t += 'NET COMMISSION:   ' + document.getElementById('rNet').textContent + NL;
+  t += '======================================' + NL;
+
+  navigator.clipboard.writeText(t).then(function() {
+    var btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied!';
+    btn.classList.add('btn-copied');
+    setTimeout(function() {
+      btn.textContent = 'Copy Order Details';
+      btn.classList.remove('btn-copied');
+    }, 2500);
+  }).catch(function() {
+    alert('Clipboard unavailable. Please copy manually.');
+  });
+}
 </script>
 
 </body>
-</html></parameter>
+</html>
